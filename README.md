@@ -13,6 +13,8 @@ I have the following interfaces, which should be reasonably straight-forward:
 
 To use me::
 
+
+```java
     // Say that we have a list of people. Person is probably annotated with JPA.
     List<Person> people = new ArrayList<>();
     people.add(new Person("Alice"), Gender.female, 33);
@@ -47,7 +49,7 @@ To use me::
         }
         System.out.println();
     });
-
+```
 
 Note how the result is a Table of Rows. If we choose to "select" individual columns, we cannot return
 POJOs.
@@ -58,20 +60,25 @@ set of "root" entities and navigable properties.
 
 For example, say that Person was (keeping in mind that it might be data from SQL or REST)::
 
+```java
     public class Person {
         String name,
         int age,
         Gender gender,
         List<Person> friends
     }
+
+```
    
 Then we could return a table containing two columns: a name, and all our friends ages, by::
 
+```java
     Query q = new Query()
         .select("name")
         .select("friends/age") 
         .orderBy("friends/age");
     return new CollectionQueryable(people).query(q);
+```
 
 Columns are navigable using OData syntax with slashes between columns, e.g. "friends/name".
 
@@ -79,6 +86,7 @@ TODO: How to create, update, delete.
 
 This library is intended for use in an OData framework, so that services can be defined as::
 
+``` java
     @EdmController
     public class PersonController {
         @EdmRequestMapping("/person", method=RequestMethod.GET)
@@ -89,7 +97,8 @@ This library is intended for use in an OData framework, so that services can be 
             // Insert post-query business logic here.
         }
     }
-                
+```
+       
 This allows the implementer to:
 
 * Include business logic before and after a query.
@@ -100,9 +109,9 @@ This allows the implementer to:
 
 This is intended to be a component of a complete OData stack comprising:
 
-Chickpea - OData front-end              
-Runner - OData test framework
-Urad - Query framework
-Dolichos - OData annotations web service
+* Chickpea - OData front-end              
+* Runner - OData test framework
+* Urad - Query framework
+* Dolichos - OData annotations web service
 
 TODO: A code generator to create a JPA-like metamodel for column names.
