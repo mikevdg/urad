@@ -83,18 +83,42 @@ Then we could return a table containing two columns: a name, and all our friends
 Columns are navigable using OData syntax with slashes between columns, e.g. "friends/name".
 
 TODO: How to create, update, delete.
+TODO: How to wrap a bulk update in a transaction? Or do transactions in general?
 
-This library is intended for use in an OData framework, so that services can be defined as::
+This library is intended for use in an OData framework, so that services can be defined such as::
 
 ``` java
-    @EdmController
+    @ODataEndpoint
     public class PersonController {
-        @EdmRequestMapping("/person", method=RequestMethod.GET)
+        
+        // HTTP GET
+        @GetEntitySet("Person")
         public Table getPersons(Query q) {
             // Insert pre-query business logic here.
             return new JPAQueryable(Person.class)
                 .query(q);
             // Insert post-query business logic here.
+        }
+
+        // HTTP POST
+        @CreateEntity("Person") // TODO - One or multiple entries in the table?
+        public Table createPerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .create(person);
+        }
+
+        // HTTP PUT
+        @UpdateEntity("Person")
+        public Table updatePerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .update(person);
+        }
+
+        // HTTP DELETE
+        @DeleteEntity("Person") 
+        public void deletePerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .delete(person);
         }
     }
 ```
