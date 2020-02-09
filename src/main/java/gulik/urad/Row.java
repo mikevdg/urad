@@ -1,4 +1,4 @@
-package com.odata.urad;
+package gulik.urad;
 
 /** I'm basically just an array. All of my important information, such as how many columns I have
  * and what type they are are in my owning Table object.

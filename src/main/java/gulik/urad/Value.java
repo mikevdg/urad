@@ -1,4 +1,4 @@
-package com.odata.urad;
+package gulik.urad;
 
 
 // TODO: should I be a wrapper class around basic types?

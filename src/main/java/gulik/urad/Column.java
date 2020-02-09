@@ -1,4 +1,4 @@
-package com.odata.urad;
+package gulik.urad;
 
 public interface Column {
     public String getName();

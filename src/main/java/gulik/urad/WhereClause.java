@@ -1,4 +1,4 @@
-package com.odata.urad;
+package gulik.urad;
 
 public class WhereClause {
     public static WhereClause equal(String columnPath, String value);

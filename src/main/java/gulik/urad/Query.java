@@ -1,4 +1,4 @@
-package com.odata.urad;
+package gulik.urad;
 
 import java.util.List;
 

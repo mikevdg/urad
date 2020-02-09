@@ -1,4 +1,4 @@
-package com.odata;
+package gulik.urad;
 
 import static org.junit.Assert.assertTrue;
 
