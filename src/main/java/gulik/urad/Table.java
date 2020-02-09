@@ -1,5 +1,7 @@
 package gulik.urad;
 
+import gulik.urad.value.Value;
+
 import java.util.List;
 import java.util.function.Consumer;
 

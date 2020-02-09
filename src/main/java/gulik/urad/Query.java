@@ -1,5 +1,8 @@
 package gulik.urad;
 
+import gulik.urad.value.Value;
+import gulik.urad.where.WhereClause;
+
 import java.util.List;
 
 /** I am a stand-alone query. I don't hold references to any other objects. You pass me to
