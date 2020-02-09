@@ -1,4 +1,7 @@
-package gulik.urad;
+package gulik.urad.queryables;
+
+import gulik.urad.Query;
+import gulik.urad.Table;
 
 public interface Queryable {
 
