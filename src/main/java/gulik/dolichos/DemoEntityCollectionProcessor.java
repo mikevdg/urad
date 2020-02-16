@@ -67,7 +67,7 @@ public class DemoEntityCollectionProcessor implements EntityCollectionProcessor 
 
         EntityCollection productsCollection = new EntityCollection();
         // check for which EdmEntitySet the data is requested
-        if(UradEdmProvider.ET_ENTITY_NAME.equals(edmEntitySet.getName())) {
+        if("TodoEntityName".equals(edmEntitySet.getName())) {
             List<Entity> productList = productsCollection.getEntities();
 
             // add some sample product entities

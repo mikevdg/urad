@@ -1,5 +1,7 @@
 package gulik.dolichos;
 
+import gulik.urad.annotations.GetEntities;
+import gulik.urad.annotations.ODataEndpoint;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.*;
@@ -11,24 +13,43 @@ import java.util.Collections;
 import java.util.List;
 
 public class UradEdmProvider extends CsdlAbstractEdmProvider {
-    // Service Namespace
-    public static final String NAMESPACE = "Todo.Namespace";
+    /*
 
-    // EDM Container
-    public static final String CONTAINER_NAME = "Container";
-    public static final FullQualifiedName CONTAINER = new FullQualifiedName(NAMESPACE, CONTAINER_NAME);
+(TODO)
+$metadata currently looks like:
 
-    // Entity Types Names
-    public static final String ET_ENTITY_NAME = "TodoEntityName";
-    public static final FullQualifiedName ET_ENTITY_FQN = new FullQualifiedName(NAMESPACE, ET_ENTITY_NAME);
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:DataServices>
+        <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Todo.Namespace">
+            <EntityType Name="TodoEntityName">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Int32"/>
+                <Property Name="Name" Type="Edm.String"/>
+                <Property Name="Description" Type="Edm.String"/>
+            </EntityType>
+            <EntityContainer Name="TodoContainer">
+                <EntitySet Name="TodoEntityName" EntityType="Todo.Namespace.TodoEntityName"/>
+            </EntityContainer>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
 
+     */
+
+    public Class<?> endpoint;
+
+    public UradEdmProvider(Class<?> endpoint) {
+        this.endpoint = endpoint;
+    }
 
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
         // TODO: Copypasta example code.
 
         // this method is called for one of the EntityTypes that are configured in the Schema
-        if(entityTypeName.equals(ET_ENTITY_FQN)){
+        if(entityTypeName.equals(new FullQualifiedName("Todo.Namespace", "TodoEntityName"))){
 
             //create EntityType properties
             CsdlProperty id = new CsdlProperty().setName("ID").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName());
@@ -41,7 +62,7 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
             // configure EntityType
             CsdlEntityType entityType = new CsdlEntityType();
-            entityType.setName(ET_ENTITY_NAME);
+            entityType.setName("TodoEntityName");
             entityType.setProperties(Arrays.asList(id, name , description));
             entityType.setKey(Collections.singletonList(propertyRef));
 
@@ -53,17 +74,16 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-
-        if (entityContainer.equals(CONTAINER)) {
-            if (entitySetName.equals(ET_ENTITY_NAME)) {
-                CsdlEntitySet entitySet = new CsdlEntitySet();
-                entitySet.setName(ET_ENTITY_NAME);
-                entitySet.setType(ET_ENTITY_FQN);
-
-                return entitySet;
+        if (entityContainer.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
+            for (GetEntities each : endpoint.getAnnotationsByType(GetEntities.class)) {
+                if (entitySetName.equals(each.value())) {
+                    CsdlEntitySet entitySet = new CsdlEntitySet();
+                    entitySet.setName(each.value());
+                    entitySet.setType(new FullQualifiedName("Todo.Namespace", each.value()));
+                    return entitySet;
+                }
             }
         }
-
         return null;
     }
 
@@ -71,9 +91,9 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
     public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName entityContainerName) throws ODataException {
 
         // This method is invoked when displaying the Service Document at e.g. http://localhost:8080/DemoService/DemoService.svc
-        if (entityContainerName == null || entityContainerName.equals(CONTAINER)) {
+        if (entityContainerName == null || entityContainerName.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
             CsdlEntityContainerInfo entityContainerInfo = new CsdlEntityContainerInfo();
-            entityContainerInfo.setContainerName(CONTAINER);
+            entityContainerInfo.setContainerName(new FullQualifiedName("Todo.Namespace", "TodoContainer"));
             return entityContainerInfo;
         }
 
@@ -85,11 +105,11 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
         // create Schema
         CsdlSchema schema = new CsdlSchema();
-        schema.setNamespace(NAMESPACE);
+        schema.setNamespace("Todo.Namespace");
 
         // add EntityTypes
         List<CsdlEntityType> entityTypes = new ArrayList<CsdlEntityType>();
-        entityTypes.add(getEntityType(ET_ENTITY_FQN));
+        entityTypes.add(getEntityType(new FullQualifiedName("Todo.Namespace", "TodoEntityName")));
         schema.setEntityTypes(entityTypes);
 
         // add EntityContainer
@@ -107,13 +127,14 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
             // create EntitySets
             List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
-            entitySets.add(getEntitySet(CONTAINER, ET_ENTITY_NAME));
+            entitySets.add(getEntitySet(new FullQualifiedName("Todo.Namespace", "TodoContainer"), "TodoEntityName"));
 
             // create EntityContainer
             CsdlEntityContainer entityContainer = new CsdlEntityContainer();
-            entityContainer.setName(CONTAINER_NAME);
+            entityContainer.setName("TodoContainer");
             entityContainer.setEntitySets(entitySets);
 
             return entityContainer;
     }
+
 }

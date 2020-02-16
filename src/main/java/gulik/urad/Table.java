@@ -1,5 +1,6 @@
 package gulik.urad;
 
+import gulik.urad.impl.Row;
 import gulik.urad.value.Value;
 
 import java.util.List;
@@ -20,9 +21,7 @@ public interface Table {
 
     List<Column> getColumns();
 
-    // Iterate over all the rows, performing the given action.
-    public void iterate(Consumer<Row> action);
-    // TODO: get one row. Iterate with a limit.
+    TableIterator iterator(); // We aren't using the standard Java ones because they suck.
 
     public Row insert(Row row);
     public Row update(Value key, Row row);

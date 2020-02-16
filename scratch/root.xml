@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app:service xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app"
+             xmlns:metadata="http://docs.oasis-open.org/odata/ns/metadata" metadata:context="$metadata">
+    <app:workspace>
+        <atom:title>Todo.Namespace.TodoContainer</atom:title>
+        <app:collection href="TodoEntityName" metadata:name="TodoEntityName">
+            <atom:title>TodoEntityName</atom:title>
+        </app:collection>
+    </app:workspace>
+</app:service>
+
+        <!-- This is what you get from http://localhost:8080/ -->

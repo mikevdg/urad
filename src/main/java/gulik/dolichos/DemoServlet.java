@@ -21,9 +21,11 @@ public class DemoServlet extends HttpServlet {
 
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         try {
+            // TODO: these are regenerated on every request! Is that expensive?
+
             // create odata handler and configure it with CsdlEdmProvider and Processor
             OData odata = OData.newInstance();
-            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(), new ArrayList<EdmxReference>());
+            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
             handler.register(new DemoEntityCollectionProcessor());
 

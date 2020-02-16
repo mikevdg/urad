@@ -92,7 +92,7 @@ This library is intended for use in an OData framework, so that services can be 
     public class PersonController {
         
         // HTTP GET
-        @GetEntitySet("Person")
+        @GetEntities("Person")
         public Table getPersons(Query q) {
             // Insert pre-query business logic here.
             return new JPAQueryable(Person.class)
@@ -101,21 +101,21 @@ This library is intended for use in an OData framework, so that services can be 
         }
 
         // HTTP POST
-        @CreateEntity("Person") // TODO - One or multiple entries in the table?
+        @CreateEntities("Person") // TODO - One or multiple entries in the table?
         public Table createPerson(Table person) {
             return new JPAQueryable(Person.class)
                 .create(person);
         }
 
         // HTTP PUT
-        @UpdateEntity("Person")
+        @UpdateEntities("Person")
         public Table updatePerson(Table person) {
             return new JPAQueryable(Person.class)
                 .update(person);
         }
 
         // HTTP DELETE
-        @DeleteEntity("Person") 
+        @DeleteEntities("Person") 
         public void deletePerson(Table person) {
             return new JPAQueryable(Person.class)
                 .delete(person);
