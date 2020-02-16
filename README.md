@@ -1,15 +1,98 @@
-# urad
+# What is this?
 
-A Java framework for managing queries on tabular data. I allow for SQL-esque queries to be performed on
+I am a library that makes it easier to create OData services in Java. I am built on Apache Olingo.
+
+# Project status
+
+It doesn't compile yet.
+
+# Project structure
+
+This project is work in progress. It contains several future projects in the same build package. These will be split up
+when they work well enough to be separately maintained:
+
+* dolichos - annotations and framework stuff for making an OData service. 
+* urad - a query framework.
+* demo - a quick web app hack to test my stuff. This will be discarded.
+* (TODO) - Spring integration?? In particular, Spring security?
+* (TODO) - OAuth integration??
+
+To run me, point your browser at http://localhost:8080/ after you do:
+
+```shell script
+$ mvn jetty:run
+```
+
+
+# Dolichos
+
+This library contains annotations and a Servlet implementation for creating OData services. 
+
+Services can be defined by::
+
+``` java
+    @ODataEndpoint
+    public class PersonController { // I'm not Spring. Don't get confused.
+        
+        // HTTP GET
+        @GetEntities("Person")
+        public Table getPersons(Query q) {
+            // Insert pre-query business logic here.
+            return new JPAQueryable(Person.class)
+                .query(q);
+            // Insert post-query business logic here.
+        }
+
+        // HTTP POST
+        @CreateEntities("Person") // TODO - One or multiple entries in the table?
+        public Table createPerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .create(person);
+        }
+
+        // HTTP PUT
+        @UpdateEntities("Person")
+        public Table updatePerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .update(person);
+        }
+
+        // HTTP DELETE
+        @DeleteEntities("Person") 
+        public void deletePerson(Table person) {
+            return new JPAQueryable(Person.class)
+                .delete(person);
+        }
+    }
+```
+
+This allows the implementer to:
+
+* Include business logic before and after a query.
+* Inspect the query before it runs, e.g. to disallow dangerously heavy queries. 
+* Modify the query before it runs, e.g. to trim excessive column navigation.
+* To add stuff to the result, e.g. from two or more queries.
+* To create his own Queryable and Table classes for very custom behaviour.
+
+
+# Urad
+
+Urad is a Java library for managing queries on tabular data. I allow for SQL-esque queries to be performed on
 standard Java lists, relational databases, via JPA bindings, or for fancier things such as OData or other
 REST services.
 
 I have the following interfaces, which should be reasonably straight-forward:
 
-* Queryable, which is an abstract wrapper for something you want to query.
-* Query, which contains "select", "from", "where", "order by" and paging components.
-* Table, which is an iterable collection of Rows, and is the result of applying a Query to a Queryable.
-* Row, which is an array of values.
+A Table is an iterable entity that has column metadata. When a client requests $metadata, this will get an empty 
+query to fetch the metadata. It returns Row objects. Both Table and Row are interfaces that the user can implement
+should the provided implementations not be satisfactory.
+
+A Query is a manipulatable object containing the query parameters from the user. It basically contains a logical   
+SQL SELECT statement.
+
+The Queryable objects convert Queries to Tables. Tables need metadata that describe their columns and structure. 
+Urad will provide at least a JPAQueryable that uses the JPA annotations to build up the metadata, and maybe
+an SQLQueryable that works using JDBC's metadata mechanisms (?). Queryables can also be made by the user.
 
 To use me::
 
@@ -85,51 +168,7 @@ Columns are navigable using OData syntax with slashes between columns, e.g. "fri
 TODO: How to create, update, delete.
 TODO: How to wrap a bulk update in a transaction? Or do transactions in general?
 
-This library is intended for use in an OData framework, so that services can be defined such as::
-
-``` java
-    @ODataEndpoint
-    public class PersonController {
-        
-        // HTTP GET
-        @GetEntities("Person")
-        public Table getPersons(Query q) {
-            // Insert pre-query business logic here.
-            return new JPAQueryable(Person.class)
-                .query(q);
-            // Insert post-query business logic here.
-        }
-
-        // HTTP POST
-        @CreateEntities("Person") // TODO - One or multiple entries in the table?
-        public Table createPerson(Table person) {
-            return new JPAQueryable(Person.class)
-                .create(person);
-        }
-
-        // HTTP PUT
-        @UpdateEntities("Person")
-        public Table updatePerson(Table person) {
-            return new JPAQueryable(Person.class)
-                .update(person);
-        }
-
-        // HTTP DELETE
-        @DeleteEntities("Person") 
-        public void deletePerson(Table person) {
-            return new JPAQueryable(Person.class)
-                .delete(person);
-        }
-    }
-```
-       
-This allows the implementer to:
-
-* Include business logic before and after a query.
-* Inspect the query before it runs, e.g. to disallow dangerously heavy queries. 
-* Modify the query before it runs, e.g. to trim excessive column navigation.
-* To add stuff to the result, e.g. from two or more queries.
-* To create his own Queryable and Table classes for very custom behaviour.
+# Project goals
 
 This is intended to be a component of a complete OData stack comprising:
 
