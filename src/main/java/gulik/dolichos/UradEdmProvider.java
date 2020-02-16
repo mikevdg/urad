@@ -1,16 +1,20 @@
 package gulik.dolichos;
 
 import gulik.urad.annotations.GetEntities;
-import gulik.urad.annotations.ODataEndpoint;
+import gulik.urad.impl.Row;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class UradEdmProvider extends CsdlAbstractEdmProvider {
     /*
@@ -75,16 +79,18 @@ $metadata currently looks like:
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
         if (entityContainer.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
-            for (GetEntities each : endpoint.getAnnotationsByType(GetEntities.class)) {
-                if (entitySetName.equals(each.value())) {
-                    CsdlEntitySet entitySet = new CsdlEntitySet();
-                    entitySet.setName(each.value());
-                    entitySet.setType(new FullQualifiedName("Todo.Namespace", each.value()));
-                    return entitySet;
+            for (Method eachMethod : endpoint.getDeclaredMethods()) {
+                for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
+                    if (entitySetName.equals(eachAnnotation.value())) {
+                        CsdlEntitySet entitySet = new CsdlEntitySet();
+                        entitySet.setName(eachAnnotation.value());
+                        entitySet.setType(new FullQualifiedName("Todo.Namespace", eachAnnotation.value()));
+                        return entitySet;
+                    }
                 }
             }
         }
-        return null;
+        throw new ODataException("Unknown entitySetName: "+entitySetName);
     }
 
     @Override
@@ -124,11 +130,13 @@ $metadata currently looks like:
 
     @Override
     public CsdlEntityContainer getEntityContainer() throws ODataException {
-
             // create EntitySets
             List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
-            entitySets.add(getEntitySet(new FullQualifiedName("Todo.Namespace", "TodoContainer"), "TodoEntityName"));
-
+            for (Method eachMethod : endpoint.getDeclaredMethods()) {
+                for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
+                    entitySets.add(getEntitySet(new FullQualifiedName("Todo.Namespace", "TodoContainer"), eachAnnotation.value()));
+                }
+            }
             // create EntityContainer
             CsdlEntityContainer entityContainer = new CsdlEntityContainer();
             entityContainer.setName("TodoContainer");
