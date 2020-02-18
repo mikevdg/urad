@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 /** I'm a disposable class from the Olingo example code. Once things start working, I'll be deleted. */
-public class DemoEntityCollectionProcessor implements EntityCollectionProcessor {
+public class DolichosEntityCollectionProcessor implements EntityCollectionProcessor {
     private OData odata;
     private ServiceMetadata serviceMetadata;
 

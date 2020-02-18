@@ -20,8 +20,10 @@ public interface Table {
     String getDescription();
 
     List<Column> getColumns();
+    List<Column> getPrimaryKey();
 
     TableIterator iterator(); // We aren't using the standard Java ones because they suck.
+    // Maybe support stream()?
 
     public Row insert(Row row);
     public Row update(Value key, Row row);

@@ -34,6 +34,11 @@ public class VegetableTable implements Table {
     }
 
     @Override
+    public List<Column> getPrimaryKey() {
+        return getColumns(); // I've only got one column!
+    }
+
+    @Override
     public TableIterator iterator() {
         return new VegetableIterator();
     }

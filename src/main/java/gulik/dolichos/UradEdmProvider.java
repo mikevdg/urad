@@ -1,5 +1,6 @@
 package gulik.dolichos;
 
+import gulik.urad.*;
 import gulik.urad.annotations.GetEntities;
 import gulik.urad.impl.Row;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
@@ -8,6 +9,7 @@ import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UradEdmProvider extends CsdlAbstractEdmProvider {
     /*
@@ -48,32 +52,66 @@ $metadata currently looks like:
         this.endpoint = endpoint;
     }
 
+    private Stream<Method> entityMethods() {
+        return Stream.of(endpoint.getDeclaredMethods())
+                .filter(each -> each.isAnnotationPresent(GetEntities.class));
+    }
+
+    private String entityName(Method method) {
+        return Stream.of(method.getAnnotationsByType(GetEntities.class))
+                .findAny().get().value();
+    }
+
     @Override
-    public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
-        // TODO: Copypasta example code.
+    public CsdlEntityType getEntityType(final FullQualifiedName entityTypeName) throws ODataException {
+        return entityMethods()
+                .filter(each -> entityTypeName.equals(new FullQualifiedName("Todo.Namespace", entityName(each))))
+                .map(this::entityTypeFromMethod)
+                .findFirst().orElseThrow(() -> new ODataException("Unknown entityTypeName: "+entityTypeName));
+    }
 
-        // this method is called for one of the EntityTypes that are configured in the Schema
-        if(entityTypeName.equals(new FullQualifiedName("Todo.Namespace", "TodoEntityName"))){
+    private CsdlEntityType entityTypeFromMethod(Method me)  {
+        return createEntityTypeFromTable(columnDefinitionsFromMethod(me));
+    }
 
-            //create EntityType properties
-            CsdlProperty id = new CsdlProperty().setName("ID").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName());
-            CsdlProperty name = new CsdlProperty().setName("Name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-            CsdlProperty  description = new CsdlProperty().setName("Description").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-
-            // create CsdlPropertyRef for Key element
-            CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-            propertyRef.setName("ID");
-
-            // configure EntityType
-            CsdlEntityType entityType = new CsdlEntityType();
-            entityType.setName("TodoEntityName");
-            entityType.setProperties(Arrays.asList(id, name , description));
-            entityType.setKey(Collections.singletonList(propertyRef));
-
-            return entityType;
+    private Table columnDefinitionsFromMethod(Method me) throws RuntimeException {
+        Query q = Query.queryDefinition();
+        try {
+            return (Table) me.invoke(endpoint.getConstructor().newInstance(), q);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Could not get a Table from " + me.getName() + "(q)");
         }
+    }
 
-        return null;
+    private CsdlEntityType createEntityTypeFromTable(Table defs) {
+        // Good luck debugging this funky code :-).
+        return new CsdlEntityType()
+                .setName(defs.getName())
+                .setProperties(
+                        defs.getColumns().stream()
+                                .map(c ->
+                                        new CsdlProperty()
+                                                .setName(c.getName())
+                                                .setType(edmTypeOf(c.getType())))
+                                .collect(Collectors.toList()))
+                .setKey(
+                        defs.getPrimaryKey().stream()
+                                .map(each -> new CsdlPropertyRef().setName(each.getName()))
+                                .collect(Collectors.toList())
+                );
+    }
+
+    private FullQualifiedName edmTypeOf(Type uradType) {
+        switch(uradType) {
+            case Integer:
+                return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
+            case String:
+                return EdmPrimitiveTypeKind.String.getFullQualifiedName();
+            case Float:
+                return EdmPrimitiveTypeKind.Decimal.getFullQualifiedName(); // TODO: Decimal???
+            default:
+                throw new NotImplemented();
+        }
     }
 
     @Override
@@ -95,28 +133,26 @@ $metadata currently looks like:
 
     @Override
     public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName entityContainerName) throws ODataException {
-
         // This method is invoked when displaying the Service Document at e.g. http://localhost:8080/DemoService/DemoService.svc
         if (entityContainerName == null || entityContainerName.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
             CsdlEntityContainerInfo entityContainerInfo = new CsdlEntityContainerInfo();
             entityContainerInfo.setContainerName(new FullQualifiedName("Todo.Namespace", "TodoContainer"));
             return entityContainerInfo;
         }
-
         return null;
     }
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
-
         // create Schema
         CsdlSchema schema = new CsdlSchema();
         schema.setNamespace("Todo.Namespace");
 
-        // add EntityTypes
-        List<CsdlEntityType> entityTypes = new ArrayList<CsdlEntityType>();
-        entityTypes.add(getEntityType(new FullQualifiedName("Todo.Namespace", "TodoEntityName")));
-        schema.setEntityTypes(entityTypes);
+        schema.setEntityTypes(
+                Stream.of(endpoint.getDeclaredMethods())
+                .filter(each -> each.isAnnotationPresent(GetEntities.class))
+                .map(each -> entityTypeFromMethod(each))
+                .collect(Collectors.toList()));
 
         // add EntityContainer
         schema.setEntityContainer(getEntityContainer());
@@ -144,5 +180,4 @@ $metadata currently looks like:
 
             return entityContainer;
     }
-
 }

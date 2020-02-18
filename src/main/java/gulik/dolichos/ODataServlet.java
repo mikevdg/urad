@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DemoServlet extends HttpServlet {
+public class ODataServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(DemoServlet.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger(ODataServlet.class.getCanonicalName());
 
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -27,7 +27,7 @@ public class DemoServlet extends HttpServlet {
             OData odata = OData.newInstance();
             ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
-            handler.register(new DemoEntityCollectionProcessor());
+            handler.register(new DolichosEntityCollectionProcessor());
 
             // let the handler do the work
             handler.process(req, resp);

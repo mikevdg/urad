@@ -13,6 +13,14 @@ import java.util.List;
  */
 public class Query {
 
+    /** A special type of query - don't retrieve rows, but return a Table object
+     * so that the caller can inspect the column definitions.
+     * @return
+     */
+    public static Query queryDefinition() {
+        return new Query(); // TODO
+    }
+
     /* Methods for building a query: */
 
     /** Add the given column to my result. You can call me multiple times to add more columns.

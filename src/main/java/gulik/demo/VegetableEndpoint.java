@@ -12,6 +12,6 @@ public class VegetableEndpoint {
         /* TODO: I should be:
         return new SomethingQueryable(q);
          */
-        return null;
+        return new VegetableTable();
     }
 }
