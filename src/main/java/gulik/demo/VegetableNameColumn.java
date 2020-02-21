@@ -19,4 +19,9 @@ public class VegetableNameColumn implements Column {
     public Type getType() {
         return Type.String;
     }
+
+    @Override
+    public int getPosition() {
+        return 0;
+    }
 }

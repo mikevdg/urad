@@ -1,12 +1,12 @@
 package gulik.demo;
 
 import gulik.urad.Column;
+import gulik.urad.Row;
 import gulik.urad.Table;
-import gulik.urad.TableIterator;
-import gulik.urad.impl.Row;
 import gulik.urad.value.Value;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /** TODO: delete me and dynamically generate tables. */
@@ -39,11 +39,6 @@ public class VegetableTable implements Table {
     }
 
     @Override
-    public TableIterator iterator() {
-        return new VegetableIterator();
-    }
-
-    @Override
     public Row insert(Row row) {
         return null;
     }
@@ -56,5 +51,10 @@ public class VegetableTable implements Table {
     @Override
     public void delete(Value key) {
 
+    }
+
+    @Override
+    public Iterator<gulik.urad.Row> iterator() {
+        return new VegetableIterator();
     }
 }

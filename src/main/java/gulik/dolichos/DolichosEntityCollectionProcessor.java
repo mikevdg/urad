@@ -1,5 +1,11 @@
 package gulik.dolichos;
 
+import gulik.urad.Column;
+import gulik.urad.Query;
+import gulik.urad.Row;
+import gulik.urad.Table;
+import gulik.urad.annotations.GetEntities;
+import gulik.urad.value.Value;
 import org.apache.olingo.commons.api.data.*;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -18,15 +24,21 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 
-/** I'm a disposable class from the Olingo example code. Once things start working, I'll be deleted. */
 public class DolichosEntityCollectionProcessor implements EntityCollectionProcessor {
+    private final Class<?> endpoint; // The class that contains your OData handlers.
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
+    public DolichosEntityCollectionProcessor(Class<?> endpoint) {
+        this.endpoint = endpoint;
+    }
 
     public void init(OData odata, ServiceMetadata serviceMetadata) {
         this.odata = odata;
@@ -35,6 +47,8 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
 
     public void readEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
             throws ODataApplicationException, SerializerException {
+        // I like how the OData tutorial says to use this code, but there's very
+        // little of your own business logic in it.
 
         // 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -63,40 +77,60 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
 
-    private EntityCollection getData(EdmEntitySet edmEntitySet){
-
-        EntityCollection productsCollection = new EntityCollection();
-        // check for which EdmEntitySet the data is requested
-        if("TodoEntityName".equals(edmEntitySet.getName())) {
-            List<Entity> productList = productsCollection.getEntities();
-
-            // add some sample product entities
-            final Entity e1 = new Entity()
-                    .addProperty(new Property(null, "ID", ValueType.PRIMITIVE, 1))
-                    .addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "Notebook Basic 15"))
-                    .addProperty(new Property(null, "Description", ValueType.PRIMITIVE,
-                            "Notebook Basic, 1.7GHz - 15 XGA - 1024MB DDR2 SDRAM - 40GB"));
-            e1.setId(createId("Products", 1));
-            productList.add(e1);
-
-            final Entity e2 = new Entity()
-                    .addProperty(new Property(null, "ID", ValueType.PRIMITIVE, 2))
-                    .addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "1UMTS PDA"))
-                    .addProperty(new Property(null, "Description", ValueType.PRIMITIVE,
-                            "Ultrafast 3G UMTS/HSDPA Pocket PC, supports GSM network"));
-            e2.setId(createId("Products", 1));
-            productList.add(e2);
-
-            final Entity e3 = new Entity()
-                    .addProperty(new Property(null, "ID", ValueType.PRIMITIVE, 3))
-                    .addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "Ergo Screen"))
-                    .addProperty(new Property(null, "Description", ValueType.PRIMITIVE,
-                            "19 Optimum Resolution 1024 x 768 @ 85Hz, resolution 1280 x 960"));
-            e3.setId(createId("Products", 1));
-            productList.add(e3);
+    private EntityCollection getData(EdmEntitySet edmEntitySet) throws ODataApplicationException {
+        Method handler = null;
+        for (Method eachMethod : endpoint.getDeclaredMethods()) {
+            for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
+                if (edmEntitySet.getName().equals(eachAnnotation.value())) {
+                    handler = eachMethod;
+                    break;
+                }
+            }
+        }
+        if (null == handler) {
+            throw new ODataApplicationException("Could not find a handler method for " + edmEntitySet.getName(),
+                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+                    Locale.ENGLISH);
         }
 
-        return productsCollection;
+        Query query = toQuery(edmEntitySet);
+        Table table;
+        try {
+            table = (Table) handler.invoke(endpoint.getConstructor().newInstance(), query);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
+            throw new ODataApplicationException("Failed to invoke hander.",
+                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+                    Locale.ENGLISH,
+                    e);
+        }
+
+        EntityCollection result = new EntityCollection();
+        List<Entity> entities = result.getEntities();
+        for (Row each : table) {
+            entities.add(toEntity(table, each));
+        }
+        return result;
+    }
+
+    private Query toQuery(EdmEntitySet edmEntitySet) {
+        // TODO
+        return new Query();
+    }
+
+    private Entity toEntity(Table table, Row row) {
+        /* This is a bit wasteful - we're creating objects to throw them away. A future version could make this more directly
+        from the network.
+         */
+        Entity result = new Entity();
+        for (Column eachColumn : table.getColumns()) {
+            Value v = row.get(eachColumn.getPosition());
+            Property p = new Property(null, eachColumn.getName(), ValueType.PRIMITIVE, v.value());
+            result.addProperty(p);
+        }
+        // TODO: we assume there is only one primary key.
+        Object primaryKey = row.get(table.getPrimaryKey().get(0).getPosition());
+        result.setId(createId(table.getName(), primaryKey));
+        return result;
     }
 
     private URI createId(String entitySetName, Object id) {

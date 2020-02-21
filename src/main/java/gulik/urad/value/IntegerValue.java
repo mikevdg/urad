@@ -6,4 +6,9 @@ public class IntegerValue extends Value {
     public IntegerValue(Integer value) {
         this.value = value;
     }
+
+    @Override
+    public Object value() {
+        return value;
+    }
 }

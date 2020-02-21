@@ -1,15 +1,13 @@
 package gulik.urad;
 
-import gulik.urad.impl.Row;
 import gulik.urad.value.Value;
 
 import java.util.List;
-import java.util.function.Consumer;
 
-/** I am tabular data which is the result of a query.
- *
-  */
-public interface Table {
+/**
+ * I am tabular data which is the result of a query.
+ */
+public interface Table extends Iterable<gulik.urad.Row> {
     /** Return my SQL name */
     String getCode();
 
@@ -22,7 +20,6 @@ public interface Table {
     List<Column> getColumns();
     List<Column> getPrimaryKey();
 
-    TableIterator iterator(); // We aren't using the standard Java ones because they suck.
     // Maybe support stream()?
 
     public Row insert(Row row);
