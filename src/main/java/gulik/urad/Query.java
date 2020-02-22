@@ -12,6 +12,12 @@ import java.util.List;
  *
  */
 public class Query {
+    private String from;
+    private List<String> selects;
+    private List<WhereClause> whereClauses;
+    private List<String> orderBy;
+    private Integer top;
+    private Integer skip;
 
     /** A special type of query - don't retrieve rows, but return a Table object
      * so that the caller can inspect the column definitions.
@@ -25,36 +31,53 @@ public class Query {
 
     /** Add the given column to my result. You can call me multiple times to add more columns.
      * Calling me multiple time with the same column path is benign. */
-    public Query select(String columnPath){/* TODO */ return this;}
-
+    public Query select(String columnPath){
+        selects.add(columnPath);
+        return this;
+    }
 
     /** OData has this concept of "select by the ID" where we are expected to know what
      * the ID is.
      * @param values The values for the IDs of this table.
      */
-    public Query selectById(Value[] values){/* TODO */ return this;}
+    public Query selectById(Value[] values){/* TODO */ throw new NotImplemented();}
 
     // TODO public Query distinct() ???
 
     /** Set my target. I can only be called once or I throw an IllegalArgumentException.
        Sometimes this is redundant; it depends on the implementation of the Queryable.
      */
-    public Query from(String entityName) throws IllegalArgumentException{/* TODO */ return this;}
+    public Query from(String entityName) {
+        this.from = entityName;
+        return this;
+    }
 
     /** Add a condition to the query. See the WhereClause class for a bunch of useful
     factory methods. Calling me multiple times just adds more conditions.
      */
-    public Query where(WhereClause clause){/* TODO */ return this;}
+    public Query where(WhereClause clause){
+        this.whereClauses.add(clause);
+        return this;
+    }
 
     /** Sort the results. Calling me multiple times adds more columns to sort by.
      */
-    public Query orderBy(String columnPath){/* TODO */ return this;}
+    public Query orderBy(String columnPath){
+        orderBy.add(columnPath);
+        return this;
+    }
 
     /** Only show this many results: */
-    public Query top(int howMany){/* TODO */ return this;}
+    public Query top(int howMany){
+        this.top = howMany;
+        return this;
+    }
 
     /** Skip this many results before showing me more: */
-    public Query skip(int howMany){/* TODO */ return this;}
+    public Query skip(int howMany){
+        this.skip = howMany;
+        return this;
+    }
 
     // TODO: group by, having.
 
@@ -62,22 +85,34 @@ public class Query {
 
     /** Remove a column in the select list from me.
      */
-    public Query removeSelect(String columnPath) throws IndexOutOfBoundsException{/* TODO */ return this;}
+    public Query removeSelect(String columnPath) throws IndexOutOfBoundsException{
+        selects.remove(columnPath);
+        return this;
+    }
 
     /** Remove one of the top-level WHERE clauses. It must be a top-level clause.
      */
-    public Query removeWhere(WhereClause clause){/* TODO */ return this;}
+    public Query removeWhere(WhereClause clause){
+        whereClauses.remove(clause);
+        return this;
+    }
 
     /** Remove the given column path from the ORDER BY list.
      */
-    public Query removeOrderBy(String columnPath){/* TODO */ return this;}
-
+    public Query removeOrderBy(String columnPath){
+        orderBy.remove(columnPath);
+        return this;
+    }
 
     /* Methods used by the Queryable. */
 
-    public List<String> getSelects(){/* TODO */ return null;}
+    public List<String> getSelects(){
+        return selects;
+    }
 
-    public String getFrom(){/* TODO */ return null;}
+    public String getFrom(){
+        return from;
+    }
 
     /** Return all the WhereClauses. These can be considered to be all in conjunction with each
      * other. Keep in mind that these are a tree structures of boolean operators.
@@ -85,10 +120,19 @@ public class Query {
      * I return the actual instances used. If a business logic person wants to modify them, they will
      * be modified in me too.
      */
-    public List<WhereClause> getWhereClauses(){/* TODO */ return null;}
+    public List<WhereClause> getWhereClauses(){
+        return whereClauses;
+    }
 
-    public List<String> getOrderBys(){/* TODO */ return null;}
+    public List<String> getOrderBys(){
+        return orderBy;
+    }
 
-    public int getTop(){/* TODO */ return 0;}
-    public int getSkip(){/* TODO */ return 0;}
+    public int getTop(){
+        return top;
+    }
+
+    public int getSkip(){
+        return skip;
+    }
 }

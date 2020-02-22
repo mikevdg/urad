@@ -114,7 +114,8 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
 
     private Query toQuery(EdmEntitySet edmEntitySet) {
         // TODO
-        return new Query();
+        return new Query()
+                .from(edmEntitySet.getName());
     }
 
     private Entity toEntity(Table table, Row row) {

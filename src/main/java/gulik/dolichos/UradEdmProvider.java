@@ -71,7 +71,7 @@ $metadata currently looks like:
     }
 
     private CsdlEntityType entityTypeFromMethod(Method me)  {
-        return createEntityTypeFromTable(columnDefinitionsFromMethod(me));
+        return createEntityTypeFromTable(columnDefinitionsFromMethod(me), entityName(me));
     }
 
     private Table columnDefinitionsFromMethod(Method me) throws RuntimeException {
@@ -79,14 +79,14 @@ $metadata currently looks like:
         try {
             return (Table) me.invoke(endpoint.getConstructor().newInstance(), q);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Could not get a Table from " + me.getName() + "(q)");
+            throw new RuntimeException("Could not get a Table from " + me.getName() + "(q)", e);
         }
     }
 
-    private CsdlEntityType createEntityTypeFromTable(Table defs) {
+    private CsdlEntityType createEntityTypeFromTable(Table defs, String name) {
         // Good luck debugging this funky code :-).
         return new CsdlEntityType()
-                .setName(defs.getName())
+                .setName(name)
                 .setProperties(
                         defs.getColumns().stream()
                                 .map(c ->
