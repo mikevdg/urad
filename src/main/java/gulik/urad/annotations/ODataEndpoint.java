@@ -8,5 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ODataEndpoint {
-    public String url() default "odata.svc";
+    String url() default "odata.svc";
+
+    String namespace() default "";
+
+    String container() default "container";
 }

@@ -1,51 +1,24 @@
 package gulik.dolichos;
 
-import gulik.urad.*;
+import gulik.urad.NotImplemented;
+import gulik.urad.Query;
+import gulik.urad.Table;
+import gulik.urad.Type;
 import gulik.urad.annotations.GetEntities;
-import gulik.urad.impl.Row;
+import gulik.urad.annotations.ODataEndpoint;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UradEdmProvider extends CsdlAbstractEdmProvider {
-    /*
-
-(TODO)
-$metadata currently looks like:
-
-<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
-    <edmx:DataServices>
-        <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Todo.Namespace">
-            <EntityType Name="TodoEntityName">
-                <Key>
-                    <PropertyRef Name="ID"/>
-                </Key>
-                <Property Name="ID" Type="Edm.Int32"/>
-                <Property Name="Name" Type="Edm.String"/>
-                <Property Name="Description" Type="Edm.String"/>
-            </EntityType>
-            <EntityContainer Name="TodoContainer">
-                <EntitySet Name="TodoEntityName" EntityType="Todo.Namespace.TodoEntityName"/>
-            </EntityContainer>
-        </Schema>
-    </edmx:DataServices>
-</edmx:Edmx>
-
-     */
-
     public Class<?> endpoint;
 
     public UradEdmProvider(Class<?> endpoint) {
@@ -62,12 +35,24 @@ $metadata currently looks like:
                 .findAny().get().value();
     }
 
+    private String namespace() {
+        return Stream.of(endpoint.getDeclaredAnnotationsByType(ODataEndpoint.class))
+                .findAny().get().namespace();
+    }
+
+    private String container() {
+        return Stream.of(endpoint.getDeclaredAnnotationsByType(ODataEndpoint.class))
+                .findAny().get().container();
+    }
+
     @Override
     public CsdlEntityType getEntityType(final FullQualifiedName entityTypeName) throws ODataException {
         return entityMethods()
-                .filter(each -> entityTypeName.equals(new FullQualifiedName("Todo.Namespace", entityName(each))))
+                .filter(each -> entityTypeName.equals(new FullQualifiedName(this.namespace()
+
+                        , entityName(each))))
                 .map(this::entityTypeFromMethod)
-                .findFirst().orElseThrow(() -> new ODataException("Unknown entityTypeName: "+entityTypeName));
+                .findFirst().orElseThrow(() -> new ODataException("Unknown entityTypeName: " + entityTypeName));
     }
 
     private CsdlEntityType entityTypeFromMethod(Method me)  {
@@ -116,13 +101,13 @@ $metadata currently looks like:
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-        if (entityContainer.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
+        if (entityContainer.equals(new FullQualifiedName(this.namespace(), this.container()))) {
             for (Method eachMethod : endpoint.getDeclaredMethods()) {
                 for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
                     if (entitySetName.equals(eachAnnotation.value())) {
                         CsdlEntitySet entitySet = new CsdlEntitySet();
                         entitySet.setName(eachAnnotation.value());
-                        entitySet.setType(new FullQualifiedName("Todo.Namespace", eachAnnotation.value()));
+                        entitySet.setType(new FullQualifiedName(this.namespace(), eachAnnotation.value()));
                         return entitySet;
                     }
                 }
@@ -134,9 +119,9 @@ $metadata currently looks like:
     @Override
     public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName entityContainerName) throws ODataException {
         // This method is invoked when displaying the Service Document at e.g. http://localhost:8080/DemoService/DemoService.svc
-        if (entityContainerName == null || entityContainerName.equals(new FullQualifiedName("Todo.Namespace", "TodoContainer"))) {
+        if (entityContainerName == null || entityContainerName.equals(new FullQualifiedName(this.namespace(), this.container()))) {
             CsdlEntityContainerInfo entityContainerInfo = new CsdlEntityContainerInfo();
-            entityContainerInfo.setContainerName(new FullQualifiedName("Todo.Namespace", "TodoContainer"));
+            entityContainerInfo.setContainerName(new FullQualifiedName(this.namespace(), this.container()));
             return entityContainerInfo;
         }
         return null;
@@ -146,7 +131,7 @@ $metadata currently looks like:
     public List<CsdlSchema> getSchemas() throws ODataException {
         // create Schema
         CsdlSchema schema = new CsdlSchema();
-        schema.setNamespace("Todo.Namespace");
+        schema.setNamespace(this.namespace());
 
         schema.setEntityTypes(
                 Stream.of(endpoint.getDeclaredMethods())
@@ -170,13 +155,13 @@ $metadata currently looks like:
             List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
             for (Method eachMethod : endpoint.getDeclaredMethods()) {
                 for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
-                    entitySets.add(getEntitySet(new FullQualifiedName("Todo.Namespace", "TodoContainer"), eachAnnotation.value()));
+                    entitySets.add(getEntitySet(new FullQualifiedName(this.namespace(), this.container()), eachAnnotation.value()));
                 }
             }
             // create EntityContainer
             CsdlEntityContainer entityContainer = new CsdlEntityContainer();
-            entityContainer.setName("TodoContainer");
-            entityContainer.setEntitySets(entitySets);
+        entityContainer.setName(this.container());
+        entityContainer.setEntitySets(entitySets);
 
             return entityContainer;
     }

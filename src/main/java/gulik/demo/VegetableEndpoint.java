@@ -9,7 +9,7 @@ import gulik.urad.queryables.collection.CollectionQueryable;
 import java.util.ArrayList;
 import java.util.List;
 
-@ODataEndpoint
+@ODataEndpoint(namespace = "salad", container = "bowl")
 public class VegetableEndpoint {
     private List<Vegetable> veges;
 
