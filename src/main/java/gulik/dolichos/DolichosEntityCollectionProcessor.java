@@ -1,9 +1,6 @@
 package gulik.dolichos;
 
-import gulik.urad.Column;
-import gulik.urad.Query;
-import gulik.urad.Row;
-import gulik.urad.Table;
+import gulik.urad.*;
 import gulik.urad.annotations.GetEntities;
 import gulik.urad.value.Value;
 import org.apache.olingo.commons.api.data.*;
@@ -22,6 +19,10 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.queryoption.CountOption;
+import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.apache.olingo.server.api.uri.queryoption.SkipOption;
+import org.apache.olingo.server.api.uri.queryoption.TopOption;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -52,8 +53,18 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
 
         // 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0); // in our example, the first segment is the EntitySet
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+        CountOption countOption = uriInfo.getCountOption();
+        boolean isCount = null != countOption && countOption.getValue();
+        if (isCount) {
+            throw new NotImplemented();
+        }
+
+        SkipOption skipOption = uriInfo.getSkipOption();
+        TopOption topOption = uriInfo.getTopOption();
+        SelectOption selectOption = uriInfo.getSelectOption();
 
         // 2nd: fetch the data from backend for this requested EntitySetName
         // it has to be delivered as EntitySet object
@@ -64,18 +75,22 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
 
         // 4th: Now serialize the content: transform from the EntitySet object to InputStream
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
-        ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
+        ContextURL contextUrl = ContextURL
+                .with()
+                .entitySet(edmEntitySet)
+                .build();
 
         final String id = request.getRawBaseUri() + "/" + edmEntitySet.getName();
         EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().id(id).contextURL(contextUrl).build();
+
         SerializerResult serializerResult = serializer.entityCollection(serviceMetadata, edmEntityType, entitySet, opts);
         InputStream serializedContent = serializerResult.getContent();
 
-        // Finally: configure the response object: set the body, headers and status code
         response.setContent(serializedContent);
         response.setStatusCode(HttpStatusCode.OK.getStatusCode());
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
+
 
     private EntityCollection getData(EdmEntitySet edmEntitySet) throws ODataApplicationException {
         Method handler = null;

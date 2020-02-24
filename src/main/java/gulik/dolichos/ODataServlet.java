@@ -28,7 +28,7 @@ public class ODataServlet extends HttpServlet {
             ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
             handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEndpoint.class));
-
+            handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEndpoint.class));
             // let the handler do the work
             handler.process(req, resp);
         } catch (RuntimeException e) {
