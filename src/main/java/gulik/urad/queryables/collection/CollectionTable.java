@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Stream;
 
 /** I'm a wrapper around a collection.
  * TODO: dictionaries can be list elements and have natural column names.
@@ -98,6 +99,11 @@ public class CollectionTable implements Table, RowGenerator {
     @Override
     public List<Column> getPrimaryKey() {
         return columns;
+    }
+
+    @Override
+    public Stream<Row> stream() {
+        return source.stream().map(each -> toRow(each));
     }
 
     @Override

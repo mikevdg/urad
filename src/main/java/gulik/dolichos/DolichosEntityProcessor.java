@@ -1,8 +1,12 @@
 package gulik.dolichos;
 
 import gulik.urad.NotImplemented;
+import gulik.urad.Query;
+import gulik.urad.Table;
+import gulik.urad.where.Clause;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.*;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -21,14 +25,15 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-public class DolichosEntityProcessor implements EntityProcessor {
-    private final Class<?> endpoint;
+public class DolichosEntityProcessor extends AnnotatedEntityReader implements EntityProcessor {
+
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
     public DolichosEntityProcessor(Class<?> endpoint) {
-        this.endpoint = endpoint;
+        super(endpoint);
     }
+
 
     @Override
     public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -63,57 +68,18 @@ public class DolichosEntityProcessor implements EntityProcessor {
     }
 
     private Entity readEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyPredicates) throws ODataApplicationException {
-        /*XXX working here.
-
-                Grab the key predicates. Make a Query object out of them.
-                The CollectionQueryable would handle this by creating a new Row out of the Query and comparing
-                it to each element in a Collection.*/
-
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
+        Query query = new Query().from(edmEntitySet.getName());
+
         for (final UriParameter key : keyPredicates) {
-            // key
             String keyName = key.getName();
-            String keyText = key.getText();
-
-            // Edm: we need this info for the comparison below
-            EdmProperty edmKeyProperty = (EdmProperty) edmEntityType.getProperty(keyName);
-            Boolean isNullable = edmKeyProperty.isNullable();
-            Integer maxLength = edmKeyProperty.getMaxLength();
-            Integer precision = edmKeyProperty.getPrecision();
-            Boolean isUnicode = edmKeyProperty.isUnicode();
-            Integer scale = edmKeyProperty.getScale();
-            // get the EdmType in order to compare
-            EdmType edmType = edmKeyProperty.getType();
-            // Key properties must be instance of primitive type
-            EdmPrimitiveType edmPrimitiveType = (EdmPrimitiveType) edmType;
-
-            // Runtime data: the value of the current entity
-            //Object valueObject = rt_entity.getProperty(keyName).getValue(); // null-check is done in FWK
-            Object valueObject = "foo";
-
-            // now need to compare the valueObject with the keyText String
-            // this is done using the type.valueToString //
-            String valueAsString = null;
-            try {
-                valueAsString = edmPrimitiveType.valueToString(valueObject, isNullable, maxLength,
-                        precision, scale, isUnicode);
-            } catch (EdmPrimitiveTypeException e) {
-                throw new ODataApplicationException("Failed to retrieve String value",
-                        HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH, e);
-            }
-
-            if (valueAsString == null) {
-                return null; // TODO
-            }
-
-            boolean matches = valueAsString.equals(keyText);
-            if (!matches) {
-                // if any of the key properties is not found in the entity, we don't need to search further
-                return null; // TODO
-            }
+            String keyValue = key.getText();
+            query.where(Clause.equal(keyName, keyValue));
         }
-        return null;
+
+        Table table = doQuery(query);
+        return toEntity(table.stream().findFirst().get(), table);
     }
 
     @Override

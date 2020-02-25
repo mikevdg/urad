@@ -3,6 +3,7 @@ package gulik.urad;
 import gulik.urad.value.Value;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * I am tabular data which is the result of a query.
@@ -19,8 +20,7 @@ public interface Table extends Iterable<gulik.urad.Row> {
 
     List<Column> getColumns();
     List<Column> getPrimaryKey();
-
-    // Maybe support stream()?
+    Stream<Row> stream();
 
     public Row insert(Row row);
     public Row update(Value key, Row row);

@@ -32,14 +32,14 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
-public class DolichosEntityCollectionProcessor implements EntityCollectionProcessor {
-    private final Class<?> endpoint; // The class that contains your OData handlers.
+public class DolichosEntityCollectionProcessor extends AnnotatedEntityReader  implements EntityCollectionProcessor {
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
     public DolichosEntityCollectionProcessor(Class<?> endpoint) {
-        this.endpoint = endpoint;
+        super(endpoint);
     }
+
 
     public void init(OData odata, ServiceMetadata serviceMetadata) {
         this.odata = odata;
@@ -56,19 +56,10 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-        CountOption countOption = uriInfo.getCountOption();
-        boolean isCount = null != countOption && countOption.getValue();
-        if (isCount) {
-            throw new NotImplemented();
-        }
-
-        SkipOption skipOption = uriInfo.getSkipOption();
-        TopOption topOption = uriInfo.getTopOption();
-        SelectOption selectOption = uriInfo.getSelectOption();
 
         // 2nd: fetch the data from backend for this requested EntitySetName
         // it has to be delivered as EntitySet object
-        EntityCollection entitySet = getData(edmEntitySet);
+        EntityCollection entitySet = toEntityCollection(doQuery(toQuery(edmEntitySet, uriInfo)));
 
         // 3rd: create a serializer based on the requested format (json)
         ODataSerializer serializer = odata.createSerializer(responseFormat);
@@ -92,68 +83,6 @@ public class DolichosEntityCollectionProcessor implements EntityCollectionProces
     }
 
 
-    private EntityCollection getData(EdmEntitySet edmEntitySet) throws ODataApplicationException {
-        Method handler = null;
-        for (Method eachMethod : endpoint.getDeclaredMethods()) {
-            for (GetEntities eachAnnotation : eachMethod.getAnnotationsByType(GetEntities.class)) {
-                if (edmEntitySet.getName().equals(eachAnnotation.value())) {
-                    handler = eachMethod;
-                    break;
-                }
-            }
-        }
-        if (null == handler) {
-            throw new ODataApplicationException("Could not find a handler method for " + edmEntitySet.getName(),
-                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
-                    Locale.ENGLISH);
-        }
 
-        Query query = toQuery(edmEntitySet);
-        Table table;
-        try {
-            table = (Table) handler.invoke(endpoint.getConstructor().newInstance(), query);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
-            throw new ODataApplicationException("Failed to invoke hander.",
-                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
-                    Locale.ENGLISH,
-                    e);
-        }
 
-        EntityCollection result = new EntityCollection();
-        List<Entity> entities = result.getEntities();
-        for (Row each : table) {
-            entities.add(toEntity(table, each));
-        }
-        return result;
-    }
-
-    private Query toQuery(EdmEntitySet edmEntitySet) {
-        // TODO
-        return new Query()
-                .from(edmEntitySet.getName());
-    }
-
-    private Entity toEntity(Table table, Row row) {
-        /* This is a bit wasteful - we're creating objects to throw them away. A future version could make this more directly
-        from the network.
-         */
-        Entity result = new Entity();
-        for (Column eachColumn : table.getColumns()) {
-            Value v = row.get(eachColumn.getPosition());
-            Property p = new Property(null, eachColumn.getName(), ValueType.PRIMITIVE, v.value());
-            result.addProperty(p);
-        }
-        // TODO: we assume there is only one primary key.
-        Object primaryKey = row.get(table.getPrimaryKey().get(0).getPosition());
-        result.setId(createId(table.getName(), primaryKey));
-        return result;
-    }
-
-    private URI createId(String entitySetName, Object id) {
-        try {
-            return new URI(entitySetName + "(" + String.valueOf(id) + ")");
-        } catch (URISyntaxException e) {
-            throw new ODataRuntimeException("Unable to create id for entity: " + entitySetName, e);
-        }
-    }
 }

@@ -1,8 +1,9 @@
 package gulik.urad;
 
 import gulik.urad.value.Value;
-import gulik.urad.where.WhereClause;
+import gulik.urad.where.Clause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** I am a stand-alone query. I don't hold references to any other objects. You pass me to
@@ -13,9 +14,9 @@ import java.util.List;
  */
 public class Query {
     private String from;
-    private List<String> selects;
-    private List<WhereClause> whereClauses;
-    private List<String> orderBy;
+    private List<String> selects = new ArrayList<>();
+    private List<Clause> whereClauses = new ArrayList<>();
+    private List<String> orderBy = new ArrayList<>();
     private Integer top;
     private Integer skip;
 
@@ -55,7 +56,7 @@ public class Query {
     /** Add a condition to the query. See the WhereClause class for a bunch of useful
     factory methods. Calling me multiple times just adds more conditions.
      */
-    public Query where(WhereClause clause){
+    public Query where(Clause clause){
         this.whereClauses.add(clause);
         return this;
     }
@@ -92,7 +93,7 @@ public class Query {
 
     /** Remove one of the top-level WHERE clauses. It must be a top-level clause.
      */
-    public Query removeWhere(WhereClause clause){
+    public Query removeWhere(Clause clause){
         whereClauses.remove(clause);
         return this;
     }
@@ -120,7 +121,7 @@ public class Query {
      * I return the actual instances used. If a business logic person wants to modify them, they will
      * be modified in me too.
      */
-    public List<WhereClause> getWhereClauses(){
+    public List<Clause> getWhereClauses(){
         return whereClauses;
     }
 

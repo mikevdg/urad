@@ -9,6 +9,7 @@ import gulik.urad.value.Value;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /** I'm returned if a query is performed with no data present - meaning that we can't derive columns. */
 public class EmptyTable implements Table {
@@ -44,6 +45,11 @@ public class EmptyTable implements Table {
     }
 
     @Override
+    public Stream<Row> stream() {
+        return new ArrayList<Row>().stream();
+    }
+
+    @Override
     public Row insert(Row row) {
         throw new NotImplemented();
     }
@@ -61,6 +67,6 @@ public class EmptyTable implements Table {
 
     @Override
     public Iterator<Row> iterator() {
-        throw new NotImplemented();
+        return new ArrayList<Row>().iterator();
     }
 }
