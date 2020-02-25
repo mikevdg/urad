@@ -6,8 +6,8 @@
 * Cannot get individual predicates. Make a select for that.
 * In general, if something can already be done, don't add another way of doing it.
 * Add transaction support.
-* Add descriptions and codes to columns.
-* Can get default values for a creatable entity.
+* Add descriptions and codes to columns. --> Annotations
+* Can get default values for a creatable entity. --> Annotations.
 * Batch updates only. Only support POST and GET.
 * Batch updates are always ordered. 
-* Batch updates can contain queries which set variables.
+* Batch updates can contain queries which set variables. --> Already exists??
