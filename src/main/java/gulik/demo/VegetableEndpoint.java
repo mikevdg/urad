@@ -17,17 +17,19 @@ public class VegetableEndpoint {
         veges = new ArrayList<>();
         Vegetable v;
 
+        // Put them out of order so we can try sorting them.
+        v = new Vegetable();
+        v.setName("cabbage");
+        veges.add(v);
+
         v = new Vegetable();
         v.setName("alfalfa");
         veges.add(v);
 
         v = new Vegetable();
-        v.setName("brussel sprout");
+        v.setName("brusselsprout");
         veges.add(v);
 
-        v = new Vegetable();
-        v.setName("cabbage");
-        veges.add(v);
 
     }
 

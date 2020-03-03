@@ -1,15 +1,11 @@
 package gulik.urad.queryables.collection;
 
-import gulik.urad.Column;
-import gulik.urad.Query;
-import gulik.urad.Row;
-import gulik.urad.Table;
+import gulik.urad.*;
 import gulik.urad.queryables.Queryable;
 import gulik.urad.value.Value;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /** I let you perform queries on standard Java Collections, Lists and Maps.
  *
@@ -34,43 +30,9 @@ public class CollectionQueryable implements Queryable {
         if (source.isEmpty()) {
             return new EmptyTable(q.getFrom());
         }
-
-        if (q.hasOrderBys()) {
-            return new CollectionTable(q.getFrom(), sorted(source, q), q);
-        } else {
-            return new CollectionTable(q.getFrom(), source, q);
-        }
+        return new CollectionTable(q.getFrom(), source.toArray(new Object[source.size()]), q);
     }
 
-    /** Return a sorted version of c, sorted by the orderBys in the Query q.*/
-    private List sorted(Collection c, Query q) {
-        /** Difficulty: we must sort by:
-         * 1. A property which could be a direct member of c, or could be down a path in c.
-         * 2. More properties of c after that.
-         */
-        Collection result = c.copy();
-        List<Comparitor> comparitors = q.getOrderBys().stream().map(each ->
-                asComparitor(each, c));
-        // for each of the orderBys,
-        for (int orderByIndex = 0; orderByIndex=q.getOrderBys().size(); i++) {
-            int from=0;
-            while (from < result.size()) {
-                to = getOrderByRangeFrom(comparitors, orderByIndex, from, result);
-                Comparitor cm = getOrderByComparitor(c, q.getOrdersBy().get(orderByIndex));
-                Arrays.sort(result, from, to, cm);
-            }
-        }
-    }
 
-    private Comparitor asComparitor(String orderBy, Collection in) {
-        throw new NotImplemented();
-    }
 
-    private int getOrderByRangeFrom(List<Comparitors> ordersBy, int orderByFrom int orderByTo, int from, Collection c) {
-        int f = from;
-        for (int i=orderByFrom; i<orderByTo; i++) {
-
-        }
-
-    }
 }

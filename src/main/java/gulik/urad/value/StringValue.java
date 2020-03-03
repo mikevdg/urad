@@ -11,4 +11,13 @@ public class StringValue extends Value {
     public Object value() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        if (null==value) {
+            return "";
+        } else {
+            return "'"+value+"'";
+        }
+    }
 }

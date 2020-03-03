@@ -69,8 +69,4 @@ public class DolichosEntityCollectionProcessor extends AnnotatedEntityReader  im
         response.setStatusCode(HttpStatusCode.OK.getStatusCode());
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
-
-
-
-
 }

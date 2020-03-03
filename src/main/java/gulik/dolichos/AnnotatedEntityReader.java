@@ -8,11 +8,17 @@ import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriInfoResource;
+import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.*;
+import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
+import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -45,7 +51,7 @@ public class AnnotatedEntityReader {
         try {
             table = (Table) getHandlerFor(query.getFrom()).invoke(endpoint.getConstructor().newInstance(), query);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
-            throw new ODataApplicationException("Failed to invoke hander.",
+            throw new ODataApplicationException("Failed to invoke constructor "+endpoint.getName()+"(query)",
                     HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
                     Locale.ENGLISH,
                     e);
@@ -72,14 +78,16 @@ public class AnnotatedEntityReader {
             result.selectCount();
         } else {
             SelectOption selectOption = uriInfo.getSelectOption();
-            for (SelectItem eachSelectItem : selectOption.getSelectItems()) {
-                // This API is confusing. TODO
-                //eachSelectItem.getResourcePath().?????
-                //result.select(...)
+            if (null != selectOption) {
+                for (SelectItem eachSelectItem : selectOption.getSelectItems()) {
+                    // This API is confusing. TODO
+                    //eachSelectItem.getResourcePath().?????
+                    //result.select(...)
+                }
             }
         }
 
-        OrderByOption orderBy = uriInfo.getOrderByOption();
+        processOrderBy(uriInfo, result);
 
         SkipOption skipOption = uriInfo.getSkipOption();
         if (null!=skipOption) {
@@ -92,6 +100,25 @@ public class AnnotatedEntityReader {
         }
 
         return result;
+    }
+
+    private void processOrderBy(UriInfo uriInfo, Query result) {
+        OrderByOption orderByOption = uriInfo.getOrderByOption();
+        if (orderByOption != null) {
+            List<OrderByItem> orderItemList = orderByOption.getOrders();
+            for(OrderByItem each : orderItemList) {
+                Expression expression = each.getExpression();
+                if (expression instanceof Member) {
+                    UriInfoResource resourcePath = ((Member) expression).getResourcePath();
+                    UriResource uriResource = resourcePath.getUriResourceParts().get(0);
+                    if (uriResource instanceof UriResourcePrimitiveProperty) {
+                        EdmProperty edmProperty = ((UriResourcePrimitiveProperty) uriResource).getProperty();
+                        final String sortPropertyName = edmProperty.getName();
+                        result.orderBy(sortPropertyName);
+                    }
+                }
+            }
+        }
     }
 
     /** Convert the given row to an Entity. The table is required for column definitions. */

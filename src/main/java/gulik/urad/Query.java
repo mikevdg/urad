@@ -19,6 +19,7 @@ public class Query {
     private List<String> orderBy = new ArrayList<>();
     private Integer top;
     private Integer skip;
+    private boolean isCount=false;
 
     /** A special type of query - don't retrieve rows, but return a Table object
      * so that the caller can inspect the column definitions.
@@ -135,5 +136,13 @@ public class Query {
 
     public int getSkip(){
         return skip;
+    }
+
+    public boolean hasOrderBys() {
+        return !orderBy.isEmpty();
+    }
+
+    public void selectCount() {
+        isCount = true;
     }
 }

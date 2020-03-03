@@ -1,4 +1,4 @@
 package gulik.urad.value;
 
-public class NotComparable {
+public class NotComparable extends RuntimeException {
 }

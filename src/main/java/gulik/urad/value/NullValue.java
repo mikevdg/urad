@@ -5,4 +5,9 @@ public class NullValue extends Value {
     public Object value() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "Null";
+    }
 }

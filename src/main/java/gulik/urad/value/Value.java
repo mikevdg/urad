@@ -2,7 +2,7 @@ package gulik.urad.value;
 
 import java.util.Objects;
 
-public abstract class Value {
+public abstract class Value implements Comparable {
     public static Value NULL = new NullValue();
 
     public static Value of(Object something) {
@@ -17,4 +17,18 @@ public abstract class Value {
     }
 
     public abstract Object value();
+
+    public int compareTo(Object x) {
+        if (null==x) {
+            return 1;
+        }
+        Value to = (Value)x;
+        if (!(value() instanceof Comparable)) {
+            throw new NotComparable();
+        }
+        if (!(to.value() instanceof Comparable)) {
+            throw new NotComparable();
+        }
+        return ((Comparable)value()).compareTo(((Comparable)to.value()));
+    }
 }
