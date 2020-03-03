@@ -31,7 +31,7 @@ This library contains annotations and a Servlet implementation for creating ODat
 Services can be defined by::
 
 ``` java
-    @ODataEndpoint
+    @ODataEndpoint(namespace="people", container="container")
     public class PersonController { // I'm not Spring. Don't get confused.
         
         // HTTP GET
@@ -44,7 +44,7 @@ Services can be defined by::
         }
 
         // HTTP POST
-        @CreateEntities("Person") // TODO - One or multiple entries in the table?
+        @CreateEntities("Person")
         public Table createPerson(Table person) {
             return new JPAQueryable(Person.class)
                 .create(person);
@@ -87,7 +87,7 @@ A Table is an iterable entity that has column metadata. When a client requests $
 query to fetch the metadata. It returns Row objects. Both Table and Row are interfaces that the user can implement
 should the provided implementations not be satisfactory.
 
-A Query is a manipulatable object containing the query parameters from the user. It basically contains a logical   
+A Query is a manipulatable object containing the query parameters from the user. It basically contains a logical
 SQL SELECT statement.
 
 The Queryable objects convert Queries to Tables. Tables need metadata that describe their columns and structure. 
@@ -165,14 +165,15 @@ Then we could return a table containing two columns: a name, and all our friends
 
 Columns are navigable using OData syntax with slashes between columns, e.g. "friends/name".
 
-TODO: How to create, update, delete.
+TODO: Add HttpServletRequest, HttpServletResponse to method parameters?
 TODO: How to wrap a bulk update in a transaction? Or do transactions in general?
+TODO: Can I help with data migrations and data refactoring if I have full schema awareness, aka liquibase?
 
 # Project goals
 
 This is intended to be a component of a complete OData stack comprising:
 
-* Chickpea - OData front-end              
+* Chickpea - OData front-end
 * Runner - OData test framework
 * Urad - Query framework
 * Dolichos - OData annotations web service
