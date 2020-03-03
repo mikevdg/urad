@@ -166,8 +166,12 @@ Then we could return a table containing two columns: a name, and all our friends
 Columns are navigable using OData syntax with slashes between columns, e.g. "friends/name".
 
 TODO: Add HttpServletRequest, HttpServletResponse to method parameters?
+
 TODO: How to wrap a bulk update in a transaction? Or do transactions in general?
+
 TODO: Can I help with data migrations and data refactoring if I have full schema awareness, aka liquibase?
+
+TODO: Is Querydsl worth investigating?
 
 # Project goals
 
