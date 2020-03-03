@@ -12,10 +12,7 @@ import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.queryoption.CountOption;
-import org.apache.olingo.server.api.uri.queryoption.SelectOption;
-import org.apache.olingo.server.api.uri.queryoption.SkipOption;
-import org.apache.olingo.server.api.uri.queryoption.TopOption;
+import org.apache.olingo.server.api.uri.queryoption.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,18 +63,35 @@ public class AnnotatedEntityReader {
     }
 
     protected Query toQuery(EdmEntitySet edmEntitySet, UriInfo uriInfo) {
+        Query result = new Query().from(edmEntitySet.getName());
+
         // TODO
         CountOption countOption = uriInfo.getCountOption();
         boolean isCount = null != countOption && countOption.getValue();
         if (isCount) {
-            throw new NotImplemented();
+            result.selectCount();
+        } else {
+            SelectOption selectOption = uriInfo.getSelectOption();
+            for (SelectItem eachSelectItem : selectOption.getSelectItems()) {
+                // This API is confusing. TODO
+                //eachSelectItem.getResourcePath().?????
+                //result.select(...)
+            }
         }
 
+        OrderByOption orderBy = uriInfo.getOrderByOption();
+
         SkipOption skipOption = uriInfo.getSkipOption();
+        if (null!=skipOption) {
+            result.skip(skipOption.getValue());
+        }
+
         TopOption topOption = uriInfo.getTopOption();
-        SelectOption selectOption = uriInfo.getSelectOption();
-        return new Query()
-                .from(edmEntitySet.getName());
+        if (null!=topOption) {
+            result.top(topOption.getValue());
+        }
+
+        return result;
     }
 
     /** Convert the given row to an Entity. The table is required for column definitions. */
