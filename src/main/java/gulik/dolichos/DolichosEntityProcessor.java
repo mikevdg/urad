@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
+/** TODO: I can be combined with DolichosEntityCollectionProcessor */
 public class DolichosEntityProcessor extends AnnotatedEntityReader implements EntityProcessor {
 
     private OData odata;

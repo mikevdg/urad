@@ -3,10 +3,8 @@ package gulik.dolichos;
 import gulik.urad.*;
 import gulik.urad.annotations.GetEntities;
 import gulik.urad.value.Value;
-import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.data.EntityCollection;
-import org.apache.olingo.commons.api.data.Property;
-import org.apache.olingo.commons.api.data.ValueType;
+import org.apache.olingo.commons.api.Constants;
+import org.apache.olingo.commons.api.data.*;
 import org.apache.olingo.commons.api.edm.*;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
@@ -162,6 +160,8 @@ public class AnnotatedEntityReader {
     }
 
     private void processExpand(EdmEntitySet edmEntitySet, UriInfo uriInfo) {
+        if (true) throw new NotImplemented();
+
         EdmNavigationProperty edmNavigationProperty=null;
         ExpandOption expandOption = uriInfo.getExpandOption();
         if (null!=expandOption) {
@@ -190,9 +190,32 @@ public class AnnotatedEntityReader {
             if(edmNavigationProperty != null) {
                 EdmEntityType expandEdmEntityType = edmNavigationProperty.getType();
                 String navPropName = edmNavigationProperty.getName();
-                // TODO: what are these now?
+                // build the inline data
+                Link link = new Link();
+                link.setTitle(navPropName);
+                link.setType(Constants.ENTITY_NAVIGATION_LINK_TYPE);
+                link.setRel(Constants.NS_ASSOCIATION_LINK_REL + navPropName);
+
+                if(edmNavigationProperty.isCollection()){ // in case of Categories(1)/$expand=Products
+                    // fetch the data for the $expand (to-many navigation) from backend
+                    // here we get the data for the expand
+                    EntityCollection expandEntityCollection = null; // storage.getRelatedEntityCollection(entity, expandEdmEntityType);
+                    link.setInlineEntitySet(expandEntityCollection);
+                    link.setHref(expandEntityCollection.getId().toASCIIString());
+                } else {  // in case of Products(1)?$expand=Category
+                    // fetch the data for the $expand (to-one navigation) from backend
+                    // here we get the data for the expand
+                    Entity expandEntity = null; // storage.getRelatedEntity(entity, expandEdmEntityType);
+                    link.setInlineEntity(expandEntity);
+                    link.setHref(expandEntity.getId().toASCIIString());
+                }
+
+                // set the link - containing the expanded data - to the current entity
+                Entity entity = null; // TODO.
+                entity.getNavigationLinks().add(link);
             }
         }
+
     }
 
     private void processOrderBy(UriInfo uriInfo, Query result) {

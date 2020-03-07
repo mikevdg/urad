@@ -20,6 +20,8 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import java.io.InputStream;
 import java.util.List;
 
+// TODO:  implements EntityCollectionProcessor, EntityProcessor,
+//    PrimitiveProcessor, PrimitiveValueProcessor, ComplexProcessor
 public class DolichosEntityCollectionProcessor extends AnnotatedEntityReader  implements EntityCollectionProcessor {
     private OData odata;
     private ServiceMetadata serviceMetadata;
