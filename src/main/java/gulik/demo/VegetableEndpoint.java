@@ -20,17 +20,24 @@ public class VegetableEndpoint {
         // Put them out of order so we can try sorting them.
         v = new Vegetable();
         v.setName("cabbage");
+        v.setColour("red");
+        v.setChildrenLikeIt(true);
+        v.setWeight(10);
         veges.add(v);
 
         v = new Vegetable();
         v.setName("alfalfa");
+        v.setColour("white");
+        v.setChildrenLikeIt(true);
+        v.setWeight(1);
         veges.add(v);
 
         v = new Vegetable();
         v.setName("brusselsprout");
+        v.setColour("green");
+        v.setChildrenLikeIt(false);
+        v.setWeight(5);
         veges.add(v);
-
-
     }
 
     @GetEntities("Vegetable")

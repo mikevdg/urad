@@ -8,7 +8,6 @@ import org.apache.olingo.commons.api.data.*;
 import org.apache.olingo.commons.api.edm.*;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
-import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.*;
 import org.apache.olingo.server.api.uri.queryoption.*;
@@ -85,7 +84,7 @@ public class AnnotatedEntityReader {
         processCount(uriInfo, result);
 
         // $select
-        processSelect(uriInfo);
+        processSelect(uriInfo, result);
 
         // $expand
         processExpand(edmEntitySet, uriInfo);
@@ -105,17 +104,17 @@ public class AnnotatedEntityReader {
         return result;
     }
 
-    private void processSelect(UriInfo uriInfo) {
-        SelectOption selectOption = uriInfo.getSelectOption(); // TODO: can be null
-        OData odata = null;
-        /* working here - extract this code
-        String selectList = odata.createUriHelper().buildContextURLSelectList(edmEntityType,
-                null, selectOption); */
+    private void processSelect(UriInfo uriInfo, Query result) throws ODataApplicationException {
+        SelectOption selectOption = uriInfo.getSelectOption();
         if (null != selectOption) {
-            for (SelectItem eachSelectItem : selectOption.getSelectItems()) {
-                // This API is confusing. TODO
-                //eachSelectItem.getResourcePath().?????
-                //result.select(...)
+            for (SelectItem each : selectOption.getSelectItems()) {
+                List<UriResource> r = each.getResourcePath().getUriResourceParts();
+                if (r.size() > 1) {
+                    throw new ODataApplicationException("Your $select is too fancy for my pathetic code.",
+                            HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+                            Locale.ENGLISH);
+                }
+                result.select(r.get(0).getSegmentValue());
             }
         }
     }
