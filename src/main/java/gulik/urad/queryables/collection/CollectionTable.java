@@ -21,6 +21,7 @@ public class CollectionTable implements Table, RowGenerator {
     private final String name;
     private final Query query;
     private final List<Column> columns;
+    private Integer count;
 
     public CollectionTable(String name, Object[] source, Query query) {
         this.name = name;
@@ -226,5 +227,15 @@ public class CollectionTable implements Table, RowGenerator {
             }
         }
         return to;
+    }
+
+    @Override
+    public boolean hasCount() {
+        return null!=count;
+    }
+
+    @Override
+    public Integer getCount() {
+        return count;
     }
 }

@@ -60,7 +60,12 @@ public class DolichosEntityCollectionProcessor extends AnnotatedEntityReader  im
                 .build();
 
         final String id = request.getRawBaseUri() + "/" + edmEntitySet.getName();
-        EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().id(id).contextURL(contextUrl).build();
+        EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions
+                .with()
+                .id(id)
+                .expand(uriInfo.getExpandOption()) // TODO - what does this do?
+                .contextURL(contextUrl)
+                .build();
 
         SerializerResult serializerResult = serializer.entityCollection(serviceMetadata, edmEntityType, entitySet, opts);
         InputStream serializedContent = serializerResult.getContent();

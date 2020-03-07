@@ -69,4 +69,14 @@ public class EmptyTable implements Table {
     public Iterator<Row> iterator() {
         return new ArrayList<Row>().iterator();
     }
+
+    @Override
+    public boolean hasCount() {
+        return true;
+    }
+
+    @Override
+    public Integer getCount() {
+        return 0;
+    }
 }
