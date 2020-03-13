@@ -28,7 +28,7 @@ public class CollectionQueryable implements Queryable {
     @Override
     public Table query(Query q) {
         if (source.isEmpty()) {
-            return new EmptyTable(q.getFrom());
+            return new EmptyTable(q.getFrom(), source.toArray(new Object[source.size()]), q);
         }
         return new CollectionTable(q.getFrom(), source.toArray(new Object[source.size()]), q);
     }

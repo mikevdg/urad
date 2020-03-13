@@ -1,5 +1,6 @@
 package gulik.urad;
 
+import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.value.Value;
 import gulik.urad.where.Clause;
 

@@ -2,6 +2,7 @@ package gulik.dolichos;
 
 import gulik.urad.*;
 import gulik.urad.annotations.GetEntities;
+import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.value.Value;
 import org.apache.olingo.commons.api.Constants;
 import org.apache.olingo.commons.api.data.*;

@@ -1,6 +1,6 @@
 package gulik.dolichos;
 
-import gulik.urad.NotImplemented;
+import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.Query;
 import gulik.urad.Table;
 import gulik.urad.Type;

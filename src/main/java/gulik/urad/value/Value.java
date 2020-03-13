@@ -1,5 +1,6 @@
 package gulik.urad.value;
 
+import java.util.Date;
 import java.util.Objects;
 
 public abstract class Value implements Comparable {
@@ -12,6 +13,9 @@ public abstract class Value implements Comparable {
         }
         if (something instanceof Integer) {
             return new IntegerValue((Integer)something);
+        }
+        if (something instanceof Date) {
+            return new DateValue((Date)something);
         }
         throw new RuntimeException("Can't make a Value out of "+ Objects.toString(something));
     }

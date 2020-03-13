@@ -1,10 +1,13 @@
 package gulik.demo;
 
+import java.util.Date;
+
 public class Vegetable {
     private String name;
     private String colour;  // TODO: an enum!
     private boolean childrenLikeIt;
     private Integer weight;
+    private Date planted; // TODO: Joda time.
 
     public String getName() {
         return name;
@@ -36,5 +39,20 @@ public class Vegetable {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public Date getPlanted() {
+        return planted;
+    }
+
+    public void setPlanted(Date planted) {
+        this.planted = planted;
+    }
+
+    @Override
+    public String toString() {
+        return "Vegetable{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

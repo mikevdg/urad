@@ -4,6 +4,7 @@ public enum Type {
     Integer,
     String,
     Float,
+    Date,
     NavigableProperty
 
 

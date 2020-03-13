@@ -1,12 +1,11 @@
 package gulik.dolichos;
 
-import gulik.urad.NotImplemented;
+import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.Query;
 import gulik.urad.Table;
 import gulik.urad.where.Clause;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.*;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -23,7 +22,6 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 
 /** TODO: I can be combined with DolichosEntityCollectionProcessor */
 public class DolichosEntityProcessor extends AnnotatedEntityReader implements EntityProcessor {

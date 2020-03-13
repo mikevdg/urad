@@ -4,13 +4,17 @@ import gulik.demo.Vegetable;
 import gulik.urad.queryables.collection.CollectionQueryable;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
 public class TestCollection {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private List<Vegetable> veges() {
         List<Vegetable> veges = new ArrayList<>();
@@ -19,28 +23,80 @@ public class TestCollection {
         // Put them out of order so we can try sorting them.
         v = new Vegetable();
         v.setName("cabbage");
+        v.setChildrenLikeIt(false);
+        v.setColour("blue");
+        v.setWeight(10);
+            v.setPlanted(date("2000-01-04"));
         veges.add(v);
 
         v = new Vegetable();
         v.setName("alfalfa");
+        v.setChildrenLikeIt(true);
+        v.setColour("yellow");
+        v.setWeight(2);
+            v.setPlanted(date("2000-01-03"));
         veges.add(v);
 
         v = new Vegetable();
         v.setName("brusselsprout");
+        v.setChildrenLikeIt(true);
+        v.setColour("grey");
+        v.setWeight(5);
+            v.setPlanted(date("2000-01-02"));
+
         veges.add(v);
         return veges;
     }
 
+    private Date date(String d) {
+        try {
+            return dateFormat.parse(d);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
-    public void testOrderBy() {
+    public void testOrderByName() {
         Query q = new Query();
         q.orderBy("Name");
 
         Table result = new CollectionQueryable(veges()).query(q);
+        int columnNum = result.getColumnNumber("Name");
 
         List<Row> v = result.stream().collect(Collectors.toList());
-        assertTrue(v.get(0).get(0).equals("alfalfa"));
-        assertTrue(v.get(1).get(0).equals("brusselsprout"));
-        assertTrue(v.get(2).get(0).equals("cabbage"));
+        assertTrue(v.get(0).get(columnNum).toString().equals("'alfalfa'"));
+        assertTrue(v.get(1).get(columnNum).toString().equals("'brusselsprout'"));
+        assertTrue(v.get(2).get(columnNum).toString().equals("'cabbage'"));
     }
+
+    @Test
+    public void testOrderByDate() {
+        Query q = new Query();
+        q.orderBy("Planted");
+
+        Table result = new CollectionQueryable(veges()).query(q);
+
+        List<Row> v = result.stream().collect(Collectors.toList());
+        int columnNum = result.getColumnNumber("Planted");
+        assertTrue(v.get(0).get(columnNum).toString().equals("2000-01-02"));
+        assertTrue(v.get(1).get(columnNum).toString().equals("2000-01-03"));
+        assertTrue(v.get(2).get(columnNum).toString().equals("2000-01-04"));
+    }
+
+
+    @Test
+    public void testOrderByWeight() {
+        Query q = new Query();
+        q.orderBy("Weight");
+
+        Table result = new CollectionQueryable(veges()).query(q);
+        int columnNum = result.getColumnNumber("Weight");
+
+        List<Row> v = result.stream().collect(Collectors.toList());
+        assertTrue(v.get(0).get(columnNum).toString().equals("2"));
+        assertTrue(v.get(1).get(columnNum).toString().equals("5"));
+        assertTrue(v.get(2).get(columnNum).toString().equals("10"));
+    }
+
 }

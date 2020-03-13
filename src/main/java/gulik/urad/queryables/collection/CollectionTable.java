@@ -1,6 +1,8 @@
 package gulik.urad.queryables.collection;
 
 import gulik.urad.*;
+import gulik.urad.exceptions.ColumnDoesNotExist;
+import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.value.Value;
 
 import java.lang.reflect.Field;
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
  * */
 public class CollectionTable implements Table, RowGenerator {
     private final Object[] source;
-    private final String name;
+    protected final String name;
     private final Query query;
     private final List<Column> columns;
     private Integer count;
@@ -77,6 +79,8 @@ public class CollectionTable implements Table, RowGenerator {
             return Type.Integer;
         } else if (Float.class.equals(t)) {
             return Type.Float;
+        } else if (Date.class.equals(t)) {
+            return Type.Date;
         }
         throw new IndexOutOfBoundsException("Method getter get"+columnName+"() returns unmappable type: "+t.getName());
     }
@@ -238,5 +242,14 @@ public class CollectionTable implements Table, RowGenerator {
     @Override
     public Integer getCount() {
         return count;
+    }
+
+    @Override
+    public int getColumnNumber(String columnName) throws ColumnDoesNotExist {
+        return columns.stream()
+                .filter(any -> columnName.equals(any.getName()))
+                .map(each -> each.getPosition())
+                .findFirst()
+                .orElseThrow(() -> new ColumnDoesNotExist(columnName));
     }
 }
