@@ -36,24 +36,24 @@ public class CollectionTable implements Table, RowGenerator {
         }
     }
 
-    /** Look at the source and set the columns using reflection. */
+    /**
+     * Look at the source and set the columns using reflection.
+     */
     private void deriveColumns() {
         Object exemplar = Arrays.stream(source).findAny().get();
 
-        int i=0;
+        // Make the columns list put-able at each index.
+        if (!query.isSelectAll()) {
+            query.getSelects().stream().forEach(each -> columns.add(null));
+        }
+
         // Is it a getter method?
         for (Method eachMethod : exemplar.getClass().getDeclaredMethods()) {
-            if(Modifier.isPublic(eachMethod.getModifiers())
+            if (Modifier.isPublic(eachMethod.getModifiers())
                     && eachMethod.getName().startsWith("get")
-                    && eachMethod.getParameterCount()==0) {
+                    && eachMethod.getParameterCount() == 0) {
                 String name = eachMethod.getName().substring(3, eachMethod.getName().length());
-                Column c = new gulik.urad.impl.Column()
-                        .setName(name)
-                        .setTitle(name)
-                        .setType(toType(name, eachMethod.getReturnType()))
-                        .setPosition(i);
-                i++;
-                this.columns.add(c);
+                maybeAddColumn(name, eachMethod.getReturnType());
             }
         }
 
@@ -61,13 +61,35 @@ public class CollectionTable implements Table, RowGenerator {
         for (Field eachField : exemplar.getClass().getDeclaredFields()) {
             if (Modifier.isPublic(eachField.getModifiers())) {
                 String name = eachField.getName();
+                maybeAddColumn(name, eachField.getType());
                 Column c = new gulik.urad.impl.Column()
                         .setName(name)
                         .setTitle(name)
-                        .setType(toType(name, eachField.getType()))
-                        .setPosition(i);
-                i++;
+                        .setType(toType(name, eachField.getType()));
                 this.columns.add(c);
+            }
+        }
+    }
+
+    private void maybeAddColumn(String name, Class<?> type) {
+        boolean selectAll = query.isSelectAll();
+        gulik.urad.impl.Column c;
+        if (selectAll || query.getSelects().contains(name)) {
+            c = new gulik.urad.impl.Column()
+                    .setName(name)
+                    .setTitle(name)
+                    .setType(toType(name, type));
+            if (selectAll) {
+                c.setPosition(this.columns.size());
+                this.columns.add(c);
+            } else {
+                int index = query.getSelects().indexOf(name);
+                if (-1 == index) {
+                    return; // We don't want this column anyway.
+                } else {
+                    c.setPosition(index);
+                    this.columns.set(index, c);
+                }
             }
         }
     }

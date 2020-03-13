@@ -113,6 +113,10 @@ public class Query {
         return selects;
     }
 
+    public boolean isSelectAll() {
+        return selects.isEmpty();
+    }
+
     public String getFrom(){
         return from;
     }
