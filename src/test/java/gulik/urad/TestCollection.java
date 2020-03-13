@@ -1,6 +1,7 @@
 package gulik.urad;
 
 import gulik.demo.Vegetable;
+import gulik.urad.exceptions.ColumnDoesNotExist;
 import gulik.urad.queryables.collection.CollectionQueryable;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestCollection {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -97,6 +98,19 @@ public class TestCollection {
         assertTrue(v.get(0).get(columnNum).toString().equals("2"));
         assertTrue(v.get(1).get(columnNum).toString().equals("5"));
         assertTrue(v.get(2).get(columnNum).toString().equals("10"));
+    }
+
+    @Test
+    public void testSelect() {
+        Query q = new Query().select("Planted").select("Weight");
+        Table result = new CollectionQueryable(veges()).query(q);
+        assertEquals(result.getColumnNumber("Planted"), 0);
+        assertEquals(result.getColumnNumber("Weight"), 1);
+
+        try {
+            result.getColumnNumber("Name");
+            fail();
+        } catch (ColumnDoesNotExist e) {}
     }
 
 }
