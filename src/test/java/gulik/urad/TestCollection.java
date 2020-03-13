@@ -40,7 +40,7 @@ public class TestCollection {
 
         List<Row> v = result.stream().collect(Collectors.toList());
         assertTrue(v.get(0).get(0).equals("alfalfa"));
-        assertTrue(v.get(1).get(0).equals("alfalfa"));
-        assertTrue(v.get(2).get(0).equals("alfalfa"));
+        assertTrue(v.get(1).get(0).equals("brusselsprout"));
+        assertTrue(v.get(2).get(0).equals("cabbage"));
     }
 }

@@ -195,7 +195,8 @@ public class CollectionTable implements Table, RowGenerator {
             while (from < source.length) {
                 int to; // End of each fragment.
                 to = findEndOfFragment(source, from, comparators, orderByIndex);
-                Arrays.sort(source, from, to, comparators.get(orderByIndex));
+                // Arrays.sort() sorts from 'from' inclusive, to 'to' exclusive. to must be one more than the end.
+                Arrays.sort(source, from, to+1, comparators.get(orderByIndex));
                 from = to+1;
             }
         }
