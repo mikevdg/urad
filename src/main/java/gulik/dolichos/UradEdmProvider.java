@@ -94,6 +94,8 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case Float:
                 return EdmPrimitiveTypeKind.Decimal.getFullQualifiedName(); // TODO: Decimal???
+            case Date:
+                return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
             default:
                 throw new NotImplemented();
         }

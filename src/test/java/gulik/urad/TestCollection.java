@@ -113,4 +113,14 @@ public class TestCollection {
         } catch (ColumnDoesNotExist e) {}
     }
 
+    @Test
+    public void testSelectAll() {
+        Query q = new Query();
+        Table result = new CollectionQueryable(veges()).query(q);
+        assertEquals(result.getColumnNumber("Name"), 0);
+        assertEquals(result.getColumnNumber("Colour"), 1);
+        assertEquals(result.getColumnNumber("Weight"), 2);
+        assertEquals(result.getColumnNumber("Planted"), 3);
+    }
+
 }

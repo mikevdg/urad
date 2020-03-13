@@ -160,7 +160,7 @@ public class AnnotatedEntityReader {
     }
 
     private void processExpand(EdmEntitySet edmEntitySet, UriInfo uriInfo) {
-        if (true) throw new NotImplemented();
+        if (true) return; // Copypasta code below doesn't work yet.
 
         EdmNavigationProperty edmNavigationProperty=null;
         ExpandOption expandOption = uriInfo.getExpandOption();
