@@ -23,22 +23,27 @@ Remove features:
 
 New features:
 
-* Maybe change the encoding to ASN.1 PER over HTTP? 
+* Maybe change the encoding to ASN.1 PER over HTTP?
+  - Maybe drop OData altogether and autogenerate OpenAPI with all the query parameters.
 
 * Does Odata already support $select=path1/path2/path3 and $filter=(path1/path2/path3 eq 'foo')???
 
 * Add transaction support. Maybe use something like a $transaction=XXX parameter. Maybe do something funky with 
   resources (tables) being immutable and getting new URIs if they change. 
-
-* Add descriptions and codes to columns. --> Annotations
-
-* Can get default values for a creatable entity. --> Annotations.
-
+  
 * Batch updates only? Only support POST and GET.
 
 * Batch updates are always ordered. 
 
-* Batch updates can contain queries which set variables. --> Already exists??
+* Batch updates can contain queries which set variables. --> Already exists?? Variables include User, current time, generated sequence results.
+
+* As well as a primary key, mark a column in a table (or complex column) as the "display" one to show to the user when only showing a summary of that table (e.g. collapsed complex column, drop-down list).
+
+* Change the column's name to a code indended for consumption by code.
+
+* Add humanName, descriptions (tool tips) to columns. --> Annotations
+
+* Can get default values for a creatable entity. --> Annotations.
 
 * Optimise for use of the browser's cache. A table's (or table segment's) URL should change if the table changes, and
   notifications for this should be sent to the browser somehow, possibly piggy-backing off other requests.
@@ -46,6 +51,11 @@ New features:
 * Maybe compress URLs. Perhaps do a funky URL encoding using one of the ASN.1 encodings and base64 it. The same 
   query on the same table version, built and encoded twice, would return the exact same URL. Give tables and columns
   special shortened codes.
+  - Another idea: put the query in the body and use a 303 to a minified URL? Hmm.
   
 * If compressed URLs are used, also provide some way of easily debugging them. 
-  
+
+* Replace formulas with a proper programming language. Maybe compile to WebAssembly and run on the browser. 
+  - Formula columns
+  - Triggers
+  - Maybe even batch updates?
