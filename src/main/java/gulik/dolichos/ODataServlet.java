@@ -25,6 +25,8 @@ public class ODataServlet extends HttpServlet {
 
             // create odata handler and configure it with CsdlEdmProvider and Processor
             OData odata = OData.newInstance();
+            // TODO: Hard-coded vegetables???
+            // TODO: Multiple entities?
             ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
             handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEndpoint.class));

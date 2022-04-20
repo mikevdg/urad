@@ -15,31 +15,31 @@ import java.util.Locale;
 public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
     @Override
     public Object visitBinaryOperator(BinaryOperatorKind binaryOperatorKind, Object value, Object t1) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitUnaryOperator(UnaryOperatorKind unaryOperatorKind, Object value) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitMethodCall(MethodKind methodKind, List<Object> list) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitLambdaExpression(String s, String s1, Expression expression) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitLiteral(Literal literal) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
@@ -70,37 +70,37 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 
                     expressions", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
         } */
-        throw new ODataApplicationException("Not implemented",
+        throw new ODataApplicationException("TODO: Not implemented",
                 HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitAlias(String s) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitTypeLiteral(EdmType edmType) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitLambdaReference(String s) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitEnum(EdmEnumType edmEnumType, List<String> list) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
     @Override
     public Object visitBinaryOperator(BinaryOperatorKind binaryOperatorKind, Object value, List<Object> list) throws ExpressionVisitException, ODataApplicationException {
-            throw new ODataApplicationException("Not implemented",
+            throw new ODataApplicationException("TODO: Not implemented",
                     HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 }

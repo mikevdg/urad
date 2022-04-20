@@ -7,6 +7,10 @@
         <servlet-name>odata</servlet-name>
         <servlet-class>gulik.dolichos.ODataServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
+         <init-param>
+            <param-name>namespace</param-name>
+            <param-value>gulik.demo</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>

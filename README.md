@@ -74,6 +74,22 @@ This allows the implementer to:
 * To add stuff to the result, e.g. from two or more queries.
 * To create his own Queryable and Table classes for very custom behaviour.
 
+Then you define it as a servlet:
+
+``` xml
+    <servlet>
+        <servlet-name>odata</servlet-name>
+        <servlet-class>gulik.dolichos.ODataServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+         <init-param>
+            <param-name>namespace</param-name>
+            <param-value>gulik.demo</param-value>
+        </init-param>
+    </servlet>
+```
+
+The implementation will search that Java namespace recursively at start-up and register all classes annotated with @ODataEndpoint. 
+
 
 # Urad
 
