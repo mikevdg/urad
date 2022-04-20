@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -117,10 +118,14 @@ public class TestCollection {
     public void testSelectAll() {
         Query q = new Query();
         Table result = new CollectionQueryable(veges()).query(q);
-        assertEquals(result.getColumnNumber("Name"), 0);
-        assertEquals(result.getColumnNumber("Colour"), 1);
-        assertEquals(result.getColumnNumber("Weight"), 2);
-        assertEquals(result.getColumnNumber("Planted"), 3);
+        // We have no guarantees about the ordering of the columns.
+        // Reflection on classes cannot tell us this.
+        HashSet<Integer> h = new HashSet<Integer>();
+        h.add(result.getColumnNumber("Name"));
+        h.add(result.getColumnNumber("Colour"));
+        h.add(result.getColumnNumber("Weight"));
+        h.add(result.getColumnNumber("Planted"));
+        assertTrue(h.size() == 4);
     }
 
 }

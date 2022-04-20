@@ -32,7 +32,4 @@ public class CollectionQueryable implements Queryable {
         }
         return new CollectionTable(q.getFrom(), source.toArray(new Object[source.size()]), q);
     }
-
-
-
 }

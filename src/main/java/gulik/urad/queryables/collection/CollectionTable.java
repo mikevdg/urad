@@ -38,6 +38,8 @@ public class CollectionTable implements Table, RowGenerator {
 
     /**
      * Look at the source and set the columns using reflection.
+     * We cannot derive the original ordering of the methods from a class.
+     * That information is lost before we get to getDeclaredMethods();
      */
     private void deriveColumns() {
         Object exemplar = Arrays.stream(source).findAny().get();
