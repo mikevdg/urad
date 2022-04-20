@@ -2,6 +2,8 @@
 
 I am a library that makes it easier to create OData services in Java. I am built on Apache Olingo.
 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mikevdg/urad)
+
 # Project status
 
 It doesn't compile yet.
