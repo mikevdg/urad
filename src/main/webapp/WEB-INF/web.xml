@@ -5,12 +5,8 @@
    http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
     <servlet>
         <servlet-name>odata</servlet-name>
-        <servlet-class>gulik.dolichos.ODataServlet</servlet-class>
+        <servlet-class>gulik.demo.VegetableServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-         <init-param>
-            <param-name>namespace</param-name>
-            <param-value>gulik.demo</param-value>
-        </init-param>
     </servlet>
 
     <servlet-mapping>

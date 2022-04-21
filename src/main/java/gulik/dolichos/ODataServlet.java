@@ -44,12 +44,12 @@ public abstract class ODataServlet extends HttpServlet {
             OData odata = OData.newInstance();
             // TODO: Hard-coded vegetables???
             // TODO: Multiple entities?
-            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEntity.class), new ArrayList<EdmxReference>());
+            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEntitySet.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
 
             handler.register(new PrintStacktraceDebugSupport());
-            handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEntity.class));
-            handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEntity.class));
+            handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEntitySet.class));
+            handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEntitySet.class));
             // let the handler do the work
             handler.process(req, resp);
         } catch (RuntimeException e) {

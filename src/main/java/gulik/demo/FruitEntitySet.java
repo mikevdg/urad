@@ -12,39 +12,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
-public class VegetableEntity implements ODataEntity {
-    private List<Vegetable> veges;
+public class FruitEntitySet implements ODataEntity {
+    private List<Fruit> fruit;
 
-    public VegetableEntity() {
-        veges = new ArrayList<>();
-        Vegetable v;
+    public FruitEntitySet() {
+        this.fruit = new ArrayList<>();
+        Fruit v;
 
-        // Put them out of order so we can try sorting them.
-        v = new Vegetable();
-        v.setName("cabbage");
-        v.setColour("red");
-        v.setChildrenLikeIt(true);
-        v.setWeight(10);
-        veges.add(v);
+        v = new Fruit();
+        v.setName("dragonfruit");
+        v.setNumberOfSeeds(5);
+        fruit.add(v);
 
-        v = new Vegetable();
-        v.setName("alfalfa");
-        v.setColour("white");
-        v.setChildrenLikeIt(true);
-        v.setWeight(1);
-        veges.add(v);
-
-        v = new Vegetable();
-        v.setName("brusselsprout");
-        v.setColour("green");
-        v.setChildrenLikeIt(false);
-        v.setWeight(5);
-        veges.add(v);
+        v = new Fruit();
+        v.setName("apple");
+        v.setNumberOfSeeds(5);
+        fruit.add(v);
     }
 
     // @GetEntities("Vegetable")
     public Table query(Query q) {
-        return new CollectionQueryable(veges).query(q);
+        return new CollectionQueryable(fruit).query(q);
     }
 
     @Override
@@ -52,9 +40,7 @@ public class VegetableEntity implements ODataEntity {
         // TODO: column types.
         return new ColumnDefinition[] {
             new ColumnDefinition("name"),
-            new ColumnDefinition("colour"),
-            new ColumnDefinition("childrenLikeIt"),
-            new ColumnDefinition("weight")
+            new ColumnDefinition("numberOfSeeds"),
         };
     }
 
