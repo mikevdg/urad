@@ -3,7 +3,10 @@ package gulik.dolichos;
 import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
+import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.debug.DebugInformation;
+import org.apache.olingo.server.api.debug.DefaultDebugSupport;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +22,18 @@ public class ODataServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(ODataServlet.class.getCanonicalName());
 
+    // TODO: only for development.
+    private class PrintStacktraceDebugSupport extends DefaultDebugSupport {
+        @Override
+        public ODataResponse createDebugResponse(final String debugFormat, final DebugInformation debugInfo) {
+            Exception e = debugInfo.getException();
+            if (null!=e) {
+                log.log(Level.WARNING, "OData error:", debugInfo.getException());
+            }
+            return super.createDebugResponse(debugFormat, debugInfo);
+        }
+    }
+
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         try {
             // TODO: these are regenerated on every request! Is that expensive?
@@ -29,6 +44,8 @@ public class ODataServlet extends HttpServlet {
             // TODO: Multiple entities?
             ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
+
+            handler.register(new PrintStacktraceDebugSupport());
             handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEndpoint.class));
             handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEndpoint.class));
             // let the handler do the work
