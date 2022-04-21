@@ -14,13 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ODataServlet extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
+public abstract class ODataServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L; // TODO
     private static final Logger log = Logger.getLogger(ODataServlet.class.getCanonicalName());
+
+    protected abstract List<ODataEntity> getEntities();
 
     // TODO: only for development.
     private class PrintStacktraceDebugSupport extends DefaultDebugSupport {
@@ -42,12 +44,12 @@ public class ODataServlet extends HttpServlet {
             OData odata = OData.newInstance();
             // TODO: Hard-coded vegetables???
             // TODO: Multiple entities?
-            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEndpoint.class), new ArrayList<EdmxReference>());
+            ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(gulik.demo.VegetableEntity.class), new ArrayList<EdmxReference>());
             ODataHttpHandler handler = odata.createHandler(edm);
 
             handler.register(new PrintStacktraceDebugSupport());
-            handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEndpoint.class));
-            handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEndpoint.class));
+            handler.register(new DolichosEntityCollectionProcessor(gulik.demo.VegetableEntity.class));
+            handler.register(new DolichosEntityProcessor(gulik.demo.VegetableEntity.class));
             // let the handler do the work
             handler.process(req, resp);
         } catch (RuntimeException e) {
