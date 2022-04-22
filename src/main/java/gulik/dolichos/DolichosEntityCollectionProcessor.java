@@ -20,16 +20,16 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import java.io.InputStream;
 import java.util.List;
 
+/** I accept HTTP requests for collections of entities.  */
+public class DolichosEntityCollectionProcessor extends EntityReader  implements EntityCollectionProcessor {
 // TODO:  implements EntityCollectionProcessor, EntityProcessor,
 //    PrimitiveProcessor, PrimitiveValueProcessor, ComplexProcessor
-public class DolichosEntityCollectionProcessor extends AnnotatedEntityReader  implements EntityCollectionProcessor {
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
-    public DolichosEntityCollectionProcessor(Class<?> endpoint) {
-        super(endpoint);
+    public DolichosEntityCollectionProcessor(List<ODataEntitySet> entitySets) {
+        super(entitySets);
     }
-
 
     public void init(OData odata, ServiceMetadata serviceMetadata) {
         this.odata = odata;

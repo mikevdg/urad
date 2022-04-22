@@ -5,7 +5,6 @@ public enum Type {
     String,
     Float,
     Date,
+    Boolean,
     NavigableProperty
-
-
 }

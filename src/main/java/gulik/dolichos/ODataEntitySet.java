@@ -3,7 +3,7 @@ package gulik.dolichos;
 import gulik.urad.Query;
 import gulik.urad.Table;
 
-public interface ODataEntity {
+public interface ODataEntitySet {
     public String getName();
     public ColumnDefinition[] getColumns();
     public Table query(Query q);

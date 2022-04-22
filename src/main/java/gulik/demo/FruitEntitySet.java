@@ -1,9 +1,10 @@
 package gulik.demo;
 
 import gulik.dolichos.ColumnDefinition;
-import gulik.dolichos.ODataEntity;
+import gulik.dolichos.ODataEntitySet;
 import gulik.urad.Query;
 import gulik.urad.Table;
+import gulik.urad.Type;
 import gulik.urad.annotations.GetEntities;
 import gulik.urad.annotations.ODataEndpoint;
 import gulik.urad.queryables.collection.CollectionQueryable;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
-public class FruitEntitySet implements ODataEntity {
+public class FruitEntitySet implements ODataEntitySet {
     private List<Fruit> fruit;
 
     public FruitEntitySet() {
@@ -37,10 +38,9 @@ public class FruitEntitySet implements ODataEntity {
 
     @Override
     public ColumnDefinition[] getColumns() {
-        // TODO: column types.
         return new ColumnDefinition[] {
-            new ColumnDefinition("name"),
-            new ColumnDefinition("numberOfSeeds"),
+            new ColumnDefinition("name", Type.String),
+            new ColumnDefinition("numberOfSeeds", Type.Integer),
         };
     }
 

@@ -3,14 +3,14 @@ package gulik.demo;
 import java.util.LinkedList;
 import java.util.List;
 
-import gulik.dolichos.ODataEntity;
+import gulik.dolichos.ODataEntitySet;
 import gulik.dolichos.ODataServlet;
 
 public class VegetableServlet extends ODataServlet {
 
     @Override
-    protected List<ODataEntity> getEntities() {
-        List<ODataEntity> result = new LinkedList<ODataEntity>();
+    protected List<ODataEntitySet> getEntitySets() {
+        List<ODataEntitySet> result = new LinkedList<ODataEntitySet>();
         result.add(new VegetableEntitySet());
         result.add(new FruitEntitySet());
         return result;

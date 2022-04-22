@@ -1,18 +1,17 @@
 package gulik.demo;
 
-import gulik.dolichos.ColumnDefinition;
-import gulik.dolichos.ODataEntity;
-import gulik.urad.Query;
-import gulik.urad.Table;
-import gulik.urad.annotations.GetEntities;
-import gulik.urad.annotations.ODataEndpoint;
-import gulik.urad.queryables.collection.CollectionQueryable;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import gulik.dolichos.ColumnDefinition;
+import gulik.dolichos.ODataEntitySet;
+import gulik.urad.Query;
+import gulik.urad.Table;
+import gulik.urad.Type;
+import gulik.urad.queryables.collection.CollectionQueryable;
+
 // @ODataEndpoint(namespace = "salad", container = "bowl")
-public class VegetableEntitySet implements ODataEntity {
+public class VegetableEntitySet implements ODataEntitySet {
     private List<Vegetable> veges;
 
     public VegetableEntitySet() {
@@ -53,19 +52,19 @@ public class VegetableEntitySet implements ODataEntity {
             Ideal code: 
             import static Factory.*;
             return columns()
-                .column("name", Text)
-                .column("colour", fk("Colour", "id"))
-                .column("childrenLikeIt", Bool)
-                .column("weight", Float)
+                .add("name", Text)
+                .add("colour", fk("Colour", "id"))
+                .add("childrenLikeIt", Bool)
+                .add("weight", Float)
+                .primaryKey("name")
                 .build();
         */
 
-        // TODO: column types.
         return new ColumnDefinition[] {
-            new ColumnDefinition("name"),
-            new ColumnDefinition("colour"),
-            new ColumnDefinition("childrenLikeIt"),
-            new ColumnDefinition("weight")
+            new ColumnDefinition("name", Type.String),
+            new ColumnDefinition("colour", Type.String),
+            new ColumnDefinition("childrenLikeIt", Type.Boolean),
+            new ColumnDefinition("weight", Type.Float)
         };
     }
 

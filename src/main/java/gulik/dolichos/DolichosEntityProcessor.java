@@ -23,16 +23,15 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import java.io.InputStream;
 import java.util.List;
 
-/** TODO: I can be combined with DolichosEntityCollectionProcessor */
-public class DolichosEntityProcessor extends AnnotatedEntityReader implements EntityProcessor {
+/** I accept HTTP requests for single entities.  */
+public class DolichosEntityProcessor extends EntityReader implements EntityProcessor {
 
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
-    public DolichosEntityProcessor(Class<?> endpoint) {
-        super(endpoint);
+    public DolichosEntityProcessor(List<ODataEntitySet> entitySets) {
+        super(entitySets);
     }
-
 
     @Override
     public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
