@@ -104,6 +104,11 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
+        ODataEntitySet s;
+        for (ODataEntitySet each : entitySets) {
+            
+        }
+
         ODataEntitySet s = entitySets
                 .stream()
                 .filter(each -> each.getName().equals(entitySetName))

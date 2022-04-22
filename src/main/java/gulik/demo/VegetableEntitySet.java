@@ -11,6 +11,7 @@ import gulik.urad.Type;
 import gulik.urad.queryables.collection.CollectionQueryable;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
+// TODO: implements Table??? extends Table? Isn't ODataEntitySet just a table?
 public class VegetableEntitySet implements ODataEntitySet {
     private List<Vegetable> veges;
 
