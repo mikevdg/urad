@@ -8,7 +8,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import gulik.demo.VegetableServlet;
-import gulik.dolichos.*;
+//import gulik.dolichos.*;
 
 import org.junit.Test;
 
@@ -24,9 +24,11 @@ public class TestServlet  {
         // request.setContentType("application/json");
 
 
-        HttpServlet servlet = new VegetableServlet();
-        servlet.init(null);
-        servlet.service(request, response);
+        HttpServlet sv = new VegetableServlet();
+        sv.init(null);
+        
+        
+        sv.service(request, response);
         response.getWriter().flush();
         String result = response.getContentAsString();
         System.out.println(result);

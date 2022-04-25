@@ -3,6 +3,7 @@ package gulik.dolichos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
@@ -16,6 +17,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 import org.apache.olingo.commons.api.ex.ODataException;
+import org.apache.olingo.commons.api.http.HttpStatusCode;
+import org.apache.olingo.server.api.ODataApplicationException;
 
 import gulik.urad.Type;
 import gulik.urad.exceptions.NotImplemented;
@@ -67,6 +70,8 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
      */
 
     private CsdlEntityType createEntityTypeFrom(ODataEntitySet es) {
+        // TODO: check for nulls on everything the user might provide.
+
         List<CsdlProperty> columns = Arrays.stream(es.getColumns())
                 .map(c -> new CsdlProperty()
                         .setName(c.getName())
@@ -104,21 +109,25 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-        ODataEntitySet s;
         for (ODataEntitySet each : entitySets) {
-            
+            String name = each.getName();
+            if (null==name) {
+                throw new Fail(each.getClass().getName()+".getName() returned null.");
+            }
+            if (name.equals(entitySetName)) {
+                CsdlEntitySet entitySet = new CsdlEntitySet();
+                entitySet.setName(name);
+                // TODO: setType()???
+                return entitySet;
+            }
         }
+        throw new Fail("Could not find entity set named " + entitySetName);
+    }
 
-        ODataEntitySet s = entitySets
-                .stream()
-                .filter(each -> each.getName().equals(entitySetName))
-                .findFirst()
-                .orElseThrow(() -> new ODataException("Unknown entitySetName: " + entitySetName));
-
-        CsdlEntitySet entitySet = new CsdlEntitySet();
-        entitySet.setName(s.getName());
-        // TODO: setType()???
-        return entitySet;
+    private class Fail extends ODataApplicationException {
+        public Fail(String message) {
+            super(message, HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+        }
     }
 
     @Override
@@ -159,13 +168,13 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
         for (ODataEntitySet each : entitySets) {
             CsdlEntitySet c = getEntitySet(
-                new FullQualifiedName(this.namespace(), this.container()),
-                each.getName());
+                    new FullQualifiedName(this.namespace(), this.container()),
+                    each.getName());
             ess.add(c);
         }
 
         return new CsdlEntityContainer()
-            .setName(this.container())
-            .setEntitySets(ess);
+                .setName(this.container())
+                .setEntitySets(ess);
     }
 }
