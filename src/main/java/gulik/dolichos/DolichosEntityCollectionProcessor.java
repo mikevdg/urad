@@ -17,6 +17,7 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -71,6 +72,13 @@ public class DolichosEntityCollectionProcessor extends EntityReader  implements 
 
         SerializerResult serializerResult = serializer.entityCollection(serviceMetadata, edmEntityType, entitySet, opts);
         InputStream serializedContent = serializerResult.getContent();
+
+        try { // TODO
+            serializedContent.transferTo(System.out);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         response.setContent(serializedContent);
         response.setStatusCode(HttpStatusCode.OK.getStatusCode());

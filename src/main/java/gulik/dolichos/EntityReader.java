@@ -75,7 +75,9 @@ public class EntityReader {
 
         List<Entity> entities = result.getEntities();
         for (Row each : table) {
-            entities.add(toEntity(each, table));
+            Entity next = toEntity(each, table); 
+            System.out.println("Next: "+next.toString());
+            entities.add(next);
         }
 
         /* When you have expanded entities:

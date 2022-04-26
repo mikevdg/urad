@@ -1,10 +1,8 @@
 package gulik.demo;
 
-import java.util.Date;
-
 public class Fruit {
     private String name;
-    private int numberOfSeeds;
+    private Integer numberOfSeeds;
 
     public String getName() {
         return name;
@@ -14,11 +12,11 @@ public class Fruit {
         this.name = name;
     }
 
-    public int getNumberOfSeeds() {
+    public Integer getNumberOfSeeds() {
         return numberOfSeeds;
     }
 
-    public void setNumberOfSeeds(int n) {
+    public void setNumberOfSeeds(Integer n) {
         this.numberOfSeeds = n;
     }
 }

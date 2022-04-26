@@ -23,6 +23,7 @@ public class TestServlet  {
     private void checkForResponse(String url, String contains) throws ServletException, IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
         request.addParameter("odata-debug", "json");
+        request.addParameter("format", "json");
         MockHttpServletResponse response = new MockHttpServletResponse();
         
         // This doesn't work unfortunately. You still get HTML.
@@ -56,6 +57,6 @@ public class TestServlet  {
 
     @Test
     public void testVegetable() throws Exception {
-        checkForResponse("/Vegetable('brusselsprout')", "green");
+        checkForResponse("/Vegetables('brusselsprout')", "green");
     }
 }

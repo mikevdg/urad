@@ -106,7 +106,9 @@ public class CollectionTable implements Table, RowGenerator {
         } else if (Date.class.equals(t)) {
             return Type.Date;
         }
-        throw new IndexOutOfBoundsException("Method getter get"+columnName+"() returns unmappable type: "+t.getName());
+        throw new IndexOutOfBoundsException(
+            "Method getter get"+columnName+"() returns unmappable type: "
+            +t.getName()+". Remember to use classes rather than boxed typed.");
     }
 
     @Override
