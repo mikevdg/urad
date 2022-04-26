@@ -117,7 +117,9 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
             if (name.equals(entitySetName)) {
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(name);
-                // TODO: setType()???
+                entitySet.setTitle("Human readable "+name); // TODO
+                // I don't understand what the type is meant to be.
+                entitySet.setType(new FullQualifiedName(this.namespace(), name));
                 return entitySet;
             }
         }

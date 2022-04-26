@@ -46,25 +46,24 @@ public class FruitEntitySet implements ODataEntitySet {
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return "Fruit";
     }
 
     @Override
     public Table create(Table t) {
         // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Table update(Table t) {
         // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Table delete(Table t) {
         // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 }
