@@ -44,7 +44,7 @@ public class VegetableEntitySet implements ODataEntitySet {
 
     // @GetEntities("Vegetable")
     public Table query(Query q) {
-        return new CollectionQueryable(veges).query(q);
+        return new CollectionQueryable(this, veges).query(q);
     }
 
     @Override

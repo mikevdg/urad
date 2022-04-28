@@ -1,7 +1,7 @@
 package gulik.demo;
 
-import gulik.dolichos.ColumnDefinition;
 import gulik.dolichos.ODataEntitySet;
+import gulik.urad.Column;
 import gulik.urad.Query;
 import gulik.urad.Table;
 import gulik.urad.Type;
@@ -33,14 +33,14 @@ public class FruitEntitySet implements ODataEntitySet {
 
     // @GetEntities("Vegetable")
     public Table query(Query q) {
-        return new CollectionQueryable(fruit).query(q);
+        return new CollectionQueryable(this, fruit).query(q);
     }
 
     @Override
-    public ColumnDefinition[] getColumns() {
-        return new ColumnDefinition[] {
-            new ColumnDefinition("name", Type.String),
-            new ColumnDefinition("numberOfSeeds", Type.Integer),
+    public Column[] getColumns() {
+        return new gulik.urad.impl.Column[] {
+            new gulik.urad.impl.Column().setName("name").setType(Type.String),
+            new gulik.urad.impl.Column().setName("numberOfSeeds").setType(Type.Integer)
         };
     }
 

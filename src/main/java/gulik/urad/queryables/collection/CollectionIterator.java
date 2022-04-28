@@ -1,9 +1,8 @@
 package gulik.urad.queryables.collection;
 
-import gulik.urad.Row;
-
-import java.util.Arrays;
 import java.util.Iterator;
+
+import gulik.urad.Row;
 
 public class CollectionIterator implements Iterator<Row> {
     private final RowGenerator rowGenerator;
@@ -11,7 +10,7 @@ public class CollectionIterator implements Iterator<Row> {
 
     public CollectionIterator(RowGenerator rg) {
         this.rowGenerator = rg;
-        subIterator =rg.sourceIterator();
+        subIterator = rg.sourceIterator();
     }
 
     @Override

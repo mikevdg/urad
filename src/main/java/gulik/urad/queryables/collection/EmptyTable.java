@@ -1,5 +1,6 @@
 package gulik.urad.queryables.collection;
 
+import gulik.dolichos.ODataEntitySet;
 import gulik.urad.Query;
 import gulik.urad.Row;
 
@@ -10,8 +11,8 @@ import java.util.stream.Stream;
 /** I'm returned if a query is performed with no data present - meaning that we can't derive columns. */
 public class EmptyTable extends CollectionTable {
 
-    public EmptyTable(String name, Object[] source, Query query) {
-        super(name, source, query);
+    public EmptyTable(ODataEntitySet definition, Object[] source, Query query) {
+        super(definition.getName(), source, query);
     }
 
     @Override

@@ -1,17 +1,28 @@
 package gulik.urad.queryables.collection;
 
-import gulik.urad.*;
-import gulik.urad.exceptions.ColumnDoesNotExist;
-import gulik.urad.exceptions.NotImplemented;
-import gulik.urad.value.Value;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import gulik.dolichos.ODataEntitySet;
+import gulik.urad.Column;
+import gulik.urad.Query;
+import gulik.urad.Row;
+import gulik.urad.Table;
+import gulik.urad.Type;
+import gulik.urad.exceptions.ColumnDoesNotExist;
+import gulik.urad.exceptions.NotImplemented;
+import gulik.urad.value.Value;
 
 /** I'm a wrapper around a collection.
  * TODO: dictionaries can be list elements and have natural column names.
@@ -20,79 +31,16 @@ import java.util.stream.Stream;
  * */
 public class CollectionTable implements Table, RowGenerator {
     private final Object[] source;
-    protected final String name;
+    protected final ODataEntitySet definition;
     private final Query query;
-    private final List<Column> columns;
     private Integer count;
 
-    public CollectionTable(String name, Object[] source, Query query) {
-        this.name = name;
+    public CollectionTable(ODataEntitySet definition, Object[] source, Query query) {
+        this.definition = definition;
         this.source = source;
         this.query = query;
-        this.columns = new ArrayList<>();
-        deriveColumns();
         if (query.hasOrderBys()) {
             sort();
-        }
-    }
-
-    /**
-     * Look at the source and set the columns using reflection.
-     * We cannot derive the original ordering of the methods from a class.
-     * That information is lost before we get to getDeclaredMethods();
-     */
-    private void deriveColumns() {
-        Object exemplar = Arrays.stream(source).findAny().get();
-
-        // Make the columns list put-able at each index.
-        if (!query.isSelectAll()) {
-            query.getSelects().stream().forEach(each -> columns.add(null));
-        }
-
-        // Is it a getter method?
-        for (Method eachMethod : exemplar.getClass().getDeclaredMethods()) {
-            if (Modifier.isPublic(eachMethod.getModifiers())
-                    && eachMethod.getName().startsWith("get")
-                    && eachMethod.getParameterCount() == 0) {
-                String name = eachMethod.getName().substring(3, eachMethod.getName().length());
-                maybeAddColumn(name, eachMethod.getReturnType());
-            }
-        }
-
-        // Is it a public field?
-        for (Field eachField : exemplar.getClass().getDeclaredFields()) {
-            if (Modifier.isPublic(eachField.getModifiers())) {
-                String name = eachField.getName();
-                maybeAddColumn(name, eachField.getType());
-                Column c = new gulik.urad.impl.Column()
-                        .setName(name)
-                        .setTitle(name)
-                        .setType(toType(name, eachField.getType()));
-                this.columns.add(c);
-            }
-        }
-    }
-
-    private void maybeAddColumn(String name, Class<?> type) {
-        boolean selectAll = query.isSelectAll();
-        gulik.urad.impl.Column c;
-        if (selectAll || query.getSelects().contains(name)) {
-            c = new gulik.urad.impl.Column()
-                    .setName(name)
-                    .setTitle(name)
-                    .setType(toType(name, type));
-            if (selectAll) {
-                c.setPosition(this.columns.size());
-                this.columns.add(c);
-            } else {
-                int index = query.getSelects().indexOf(name);
-                if (-1 == index) {
-                    return; // We don't want this column anyway.
-                } else {
-                    c.setPosition(index);
-                    this.columns.set(index, c);
-                }
-            }
         }
     }
 
@@ -113,27 +61,36 @@ public class CollectionTable implements Table, RowGenerator {
 
     @Override
     public String getCode() {
-        return name;
+        return definition.getName();
     }
 
     @Override
     public String getName() {
-        return name;
+        // TODO: There is a "title" used in OData.
+        return definition.getName();
     }
 
     @Override
     public String getDescription() {
-        return name;
+        // TODO
+        return definition.getName();
     }
 
     @Override
     public List<Column> getColumns() {
-        return columns;
+        return definition.getColumns();
     }
 
     @Override
     public List<Column> getPrimaryKey() {
-        return columns;
+        List<Column> result = new ArrayList<>();
+        for (Column each : getColumns()) {
+            if (each.isPrimaryKey()) {
+                result.add(each);
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -168,9 +125,26 @@ public class CollectionTable implements Table, RowGenerator {
 
     @Override
     public Row toRow(Object something) {
-        Row result = new gulik.urad.impl.Row(columns.size());
-        columns.stream().forEach(each -> result.set(each.getPosition(), getValue(something, each.getName())));
-        return result;
+        int numColumns;
+        if (this.query.getSelects().isEmpty()) {
+            // SELECT * 
+            numColumns = this.definition.getColumns().length;
+            Row result = new gulik.urad.impl.Row(numColumns);
+            int i=0;
+            for (ColumnDefinition each : this.definition.getColumns()) {
+                result.set(i, getValue(something, each.getName()));
+            }
+            return result;
+        } else {
+            // SELECT A, B, C...
+            numColumns = this.query.getSelects().size();
+            Row result = new gulik.urad.impl.Row(numColumns);
+            int i=0;
+            for (String each : this.query.getSelects()) {
+                result.set(i, getValue(something, each));
+            }
+            return result;
+        }
     }
 
     public Value getValue(Object something, String columnName) {
@@ -181,7 +155,8 @@ public class CollectionTable implements Table, RowGenerator {
             if(Modifier.isPublic(eachMethod.getModifiers())
                     && eachMethod.getName().startsWith("get")
                     && eachMethod.getParameterCount()==0) {
-                if (("get" + columnName).equals(eachMethod.getName())) {
+                if (("get" + columnName).toLowerCase().equals(eachMethod.getName().toLowerCase())) {
+                    // We do toLowerCase() because the column might be named "foo" and the getter is "getFoo()"
                     try {
                         Value v = Value.of(eachMethod.invoke(something));
                         return v;

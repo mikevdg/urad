@@ -5,5 +5,6 @@ public interface Column {
     public String getTitle();
     public Type getType();
 
-    int getPosition();
+    public boolean isPrimaryKey();
+    public int getPosition();
 }
