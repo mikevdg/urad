@@ -42,19 +42,20 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 import gulik.urad.Query;
 import gulik.urad.Row;
 import gulik.urad.Table;
+import gulik.urad.ResultSet;
 import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
 public class EntityReader {
-    List<ODataEntitySet> entitySets;
+    List<Table> entitySets;
 
-    public EntityReader(List<ODataEntitySet> entitySets) {
+    public EntityReader(List<Table> entitySets) {
         this.entitySets = entitySets;
     }
 
-    protected Table doQuery(Query query) throws ODataApplicationException {
+    protected ResultSet doQuery(Query query) throws ODataApplicationException {
         String tableName = query.getFrom();
-        ODataEntitySet es = entitySets
+        Table es = entitySets
             .stream()
             .filter(each -> each.getName().equals(tableName))
             .findFirst()
@@ -65,7 +66,7 @@ public class EntityReader {
         return es.query(query);
     }
 
-    protected EntityCollection toEntityCollection(Table table) {
+    protected EntityCollection toEntityCollection(ResultSet table) {
         EntityCollection result = new EntityCollection();
 
         if (table.hasCount()) {
@@ -250,7 +251,7 @@ public class EntityReader {
     }
 
     /** Convert the given row to an Entity. The table is required for column definitions. */
-    protected Entity toEntity(Row row, Table table) {
+    protected Entity toEntity(Row row, ResultSet table) {
         /* This is a bit wasteful - we're creating objects to throw them away. A future version could make this more directly
         from the network.
          */

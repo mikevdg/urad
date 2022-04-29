@@ -8,6 +8,8 @@ import org.apache.olingo.server.api.ServiceMetadata;
 import org.apache.olingo.server.api.debug.DebugInformation;
 import org.apache.olingo.server.api.debug.DefaultDebugSupport;
 
+import gulik.urad.Table;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,11 +26,11 @@ public abstract class ODataServlet extends HttpServlet {
     private static final Logger log = Logger.getLogger(ODataServlet.class.getCanonicalName());
 
     ODataHttpHandler handler;
-    protected abstract List<ODataEntitySet> getEntitySets();
+    protected abstract List<Table> getEntitySets();
 
     
     public void init(ServletConfig config) throws ServletException {
-        List<ODataEntitySet> entitySets = getEntitySets();
+        List<Table> entitySets = getEntitySets();
 
         OData odata = OData.newInstance();
         ServiceMetadata edm = odata.createServiceMetadata(new UradEdmProvider(entitySets), new ArrayList<EdmxReference>());

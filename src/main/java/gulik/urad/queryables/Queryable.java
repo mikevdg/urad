@@ -1,7 +1,7 @@
 package gulik.urad.queryables;
 
 import gulik.urad.Query;
-import gulik.urad.Table;
+import gulik.urad.ResultSet;
 
 /** I am a "utility" class to convert a Query into a Table. I perform the given query on whatever
  * data you set me up with.
@@ -11,5 +11,5 @@ import gulik.urad.Table;
 public interface Queryable {
 
     /** Perform the given query and return a result. */
-    Table query(Query q);
+    ResultSet query(Query q);
 }

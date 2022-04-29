@@ -17,6 +17,8 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
+import gulik.urad.Table;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -28,7 +30,7 @@ public class DolichosEntityCollectionProcessor extends EntityReader  implements 
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
-    public DolichosEntityCollectionProcessor(List<ODataEntitySet> entitySets) {
+    public DolichosEntityCollectionProcessor(List<Table> entitySets) {
         super(entitySets);
     }
 

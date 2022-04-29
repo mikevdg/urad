@@ -20,13 +20,14 @@ import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 
+import gulik.urad.Table;
 import gulik.urad.Type;
 import gulik.urad.exceptions.NotImplemented;
 
 public class UradEdmProvider extends CsdlAbstractEdmProvider {
-    public List<ODataEntitySet> entitySets;
+    public List<Table> entitySets;
 
-    public UradEdmProvider(List<ODataEntitySet> entitySets) {
+    public UradEdmProvider(List<Table> entitySets) {
         this.entitySets = entitySets;
     }
 
@@ -40,7 +41,7 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntityType getEntityType(final FullQualifiedName entityTypeName) throws ODataException {
-        ODataEntitySet t = entitySets
+        Table t = entitySets
                 .stream()
                 .filter(each -> each.getName().equals(entityTypeName.getName()))
                 .findFirst()
@@ -69,7 +70,7 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
      * }
      */
 
-    private CsdlEntityType createEntityTypeFrom(ODataEntitySet es) {
+    private CsdlEntityType createEntityTypeFrom(Table es) {
         // TODO: check for nulls on everything the user might provide.
 
         List<CsdlProperty> columns = es.getColumns().stream()
@@ -109,7 +110,7 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-        for (ODataEntitySet each : entitySets) {
+        for (Table each : entitySets) {
             String name = each.getName();
             if (null==name) {
                 throw new Fail(each.getClass().getName()+".getName() returned null.");
@@ -168,7 +169,7 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
     public CsdlEntityContainer getEntityContainer() throws ODataException {
         List<CsdlEntitySet> ess = new ArrayList<CsdlEntitySet>();
 
-        for (ODataEntitySet each : entitySets) {
+        for (Table each : entitySets) {
             CsdlEntitySet c = getEntitySet(
                     new FullQualifiedName(this.namespace(), this.container()),
                     each.getName());

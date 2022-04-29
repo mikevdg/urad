@@ -1,8 +1,8 @@
 package gulik.demo;
 
 import gulik.dolichos.ColumnListBuilder;
-import gulik.dolichos.ODataEntitySet;
 import gulik.urad.Query;
+import gulik.urad.ResultSet;
 import gulik.urad.Table;
 import gulik.urad.Type;
 import gulik.urad.annotations.GetEntities;
@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
-public class FruitEntitySet implements ODataEntitySet {
+public class FruitTable implements Table {
     private List<Fruit> fruit;
 
-    public FruitEntitySet() {
+    public FruitTable() {
         this.fruit = new ArrayList<>();
         Fruit v;
 
@@ -33,7 +33,7 @@ public class FruitEntitySet implements ODataEntitySet {
     }
 
     // @GetEntities("Vegetable")
-    public Table query(Query q) {
+    public ResultSet query(Query q) {
         return new CollectionQueryable(this, fruit).query(q);
     }
 
@@ -52,19 +52,19 @@ public class FruitEntitySet implements ODataEntitySet {
     }
 
     @Override
-    public Table create(Table t) {
+    public ResultSet create(ResultSet t) {
         // TODO Auto-generated method stub
         throw new NotImplementedException();
     }
 
     @Override
-    public Table update(Table t) {
+    public ResultSet update(ResultSet t) {
         // TODO Auto-generated method stub
         throw new NotImplementedException();
     }
 
     @Override
-    public Table delete(Table t) {
+    public ResultSet delete(ResultSet t) {
         // TODO Auto-generated method stub
         throw new NotImplementedException();
     }

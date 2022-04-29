@@ -1,9 +1,9 @@
 package gulik.urad.tableColumn;
 
-import gulik.urad.Table;
+import gulik.urad.ResultSet;
 
 public class ForeignKeyColumn extends TableColumn {
     private TableColumn keyColumn;    
-    private Table foreignTable;
+    private ResultSet foreignTable;
     private TableColumn foreignColumn;
 }

@@ -14,10 +14,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import gulik.dolichos.ODataEntitySet;
 import gulik.urad.Query;
 import gulik.urad.Row;
 import gulik.urad.Table;
+import gulik.urad.ResultSet;
 import gulik.urad.Type;
 import gulik.urad.exceptions.ColumnDoesNotExist;
 import gulik.urad.exceptions.NotImplemented;
@@ -29,13 +29,13 @@ import gulik.urad.value.Value;
  * TODO: Can a Map be a source?
  * TODO: The JPAQueryable will be similar to this - reuse code?
  * */
-public class CollectionTable implements Table, RowGenerator {
+public class CollectionResultSet implements ResultSet, RowGenerator {
     private final Object[] source;
-    protected final ODataEntitySet definition;
+    protected final Table definition;
     private final Query query;
     private Integer count;
 
-    public CollectionTable(ODataEntitySet definition, Object[] source, Query query) {
+    public CollectionResultSet(Table definition, Object[] source, Query query) {
         this.definition = definition;
         this.source = source;
         this.query = query;
@@ -79,6 +79,13 @@ public class CollectionTable implements Table, RowGenerator {
     @Override
     public List<TableColumn> getColumns() {
         return definition.getColumns();
+    }
+
+    @Override
+    public QueryColumn getColumnByName(String name) {
+        for (QueryColumn each : query.getSelects()) {
+
+        }
     }
 
     @Override

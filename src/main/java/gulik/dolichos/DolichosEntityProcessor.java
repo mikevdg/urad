@@ -2,6 +2,7 @@ package gulik.dolichos;
 
 import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.Query;
+import gulik.urad.ResultSet;
 import gulik.urad.Table;
 import gulik.urad.where.Clause;
 import org.apache.olingo.commons.api.data.ContextURL;
@@ -29,7 +30,7 @@ public class DolichosEntityProcessor extends EntityReader implements EntityProce
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
-    public DolichosEntityProcessor(List<ODataEntitySet> entitySets) {
+    public DolichosEntityProcessor(List<Table> entitySets) {
         super(entitySets);
     }
 
@@ -76,7 +77,7 @@ public class DolichosEntityProcessor extends EntityReader implements EntityProce
             query.where(Clause.equal(keyName, keyValue));
         }
 
-        Table table = doQuery(query);
+        ResultSet table = doQuery(query);
         return toEntity(table.stream().findFirst().get(), table);
     }
 

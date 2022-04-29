@@ -1,40 +1,24 @@
 package gulik.urad;
 
-import gulik.urad.exceptions.ColumnDoesNotExist;
-import gulik.urad.tableColumn.TableColumn;
-import gulik.urad.value.Value;
-
 import java.util.List;
-import java.util.stream.Stream;
 
-/**
- * I am tabular data which is the result of a query.
- */
-public interface Table extends Iterable<gulik.urad.Row> {
-    /** Return my SQL name */
-    String getCode();
+import gulik.urad.tableColumn.TableColumn;
 
-    /** Return my human-readable name. */
-    String getName();
+/* TODO: Is this just a "Table"?
 
-    /** Return a lengthy diatribe of what I am. */
-    String getDescription();
+Do we need to have a differentiation between a table as a ResultSet and a table as a TableDefinition?
 
-    List<TableColumn> getColumns();
-    List<TableColumn> getPrimaryKey();
-    Stream<Row> stream();
+If you run a query, what you get back is tabular. Can it be a table? Is there a difference between a table and a query result?
 
-    /** The "count" concept in OData differs from SQL. In an OData response, the count of the entire query
-     * is returned *with* some items of the query. The count ignores $top and $skip.
-     *
-     * If you want a value here, you need to use selectCount() when you make the Query.
-     * @return
-     */
-    boolean hasCount();
-    Integer getCount();
+Tables have concrete implementations. Query results are generated. I guess they share the same interface.
 
-    public Row insert(Row row);
-    public Row update(Value key, Row row);
-    public void delete(Value key);
+*/
 
+public interface Table {
+    public String getName();
+    public List<TableColumn> getColumns();
+    public ResultSet query(Query q);
+    public ResultSet create(ResultSet t);
+    public ResultSet update(ResultSet t);
+    public ResultSet delete(ResultSet t);
 }

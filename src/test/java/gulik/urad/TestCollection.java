@@ -1,6 +1,7 @@
 package gulik.urad;
 
 import gulik.demo.Vegetable;
+import gulik.demo.VegetableTable;
 import gulik.urad.exceptions.ColumnDoesNotExist;
 import gulik.urad.queryables.collection.CollectionQueryable;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class TestCollection {
         Query q = new Query();
         q.orderBy("Name");
 
-        Table result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new VegetableTable().query(q);
         int columnNum = result.getColumnNumber("Name");
 
         List<Row> v = result.stream().collect(Collectors.toList());
@@ -77,7 +78,7 @@ public class TestCollection {
         Query q = new Query();
         q.orderBy("Planted");
 
-        Table result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new CollectionQueryable(veges()).query(q);
 
         List<Row> v = result.stream().collect(Collectors.toList());
         int columnNum = result.getColumnNumber("Planted");
@@ -92,7 +93,7 @@ public class TestCollection {
         Query q = new Query();
         q.orderBy("Weight");
 
-        Table result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new CollectionQueryable(veges()).query(q);
         int columnNum = result.getColumnNumber("Weight");
 
         List<Row> v = result.stream().collect(Collectors.toList());
@@ -104,7 +105,7 @@ public class TestCollection {
     @Test
     public void testSelect() {
         Query q = new Query().select("Planted").select("Weight");
-        Table result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new CollectionQueryable(veges()).query(q);
         assertEquals(result.getColumnNumber("Planted"), 0);
         assertEquals(result.getColumnNumber("Weight"), 1);
 
@@ -117,7 +118,7 @@ public class TestCollection {
     @Test
     public void testSelectAll() {
         Query q = new Query();
-        Table result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new CollectionQueryable(veges()).query(q);
         // We have no guarantees about the ordering of the columns.
         // Reflection on classes cannot tell us this.
         HashSet<Integer> h = new HashSet<Integer>();
