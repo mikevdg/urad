@@ -5,6 +5,7 @@ import gulik.urad.value.StringValue;
 
 /** I am a boolean operator or comparison. I am anything that can be put in a WHERE clause. */
 public abstract class Clause {
+    // TODO: What should I do with these columnPaths? Convert them to TableColumns somehow?
     public static Comparison equal(String columnPath, String value){
         return new Comparison(
                 new ColumnRef(columnPath),

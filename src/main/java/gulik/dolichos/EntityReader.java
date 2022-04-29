@@ -42,6 +42,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 import gulik.urad.Query;
 import gulik.urad.Row;
 import gulik.urad.Table;
+import gulik.urad.queryColumn.QueryColumn;
 import gulik.urad.ResultSet;
 import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
@@ -53,17 +54,13 @@ public class EntityReader {
         this.entitySets = entitySets;
     }
 
-    protected ResultSet doQuery(Query query) throws ODataApplicationException {
-        String tableName = query.getFrom();
-        Table es = entitySets
-            .stream()
-            .filter(each -> each.getName().equals(tableName))
-            .findFirst()
-            .orElseThrow(()->new ODataApplicationException("Could not find an entity set named "+tableName,
-                HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
-                Locale.ENGLISH));
-                
-        return es.query(query);
+    protected Query getQueryByName(String name) {
+        for (Table each : entitySets) {
+            if (each.getName().equals(name)) {
+                return new Query().from(each);
+            }
+        }
+        throw new IndexOutOfBoundsException("Could not find entity set "+name);
     }
 
     protected EntityCollection toEntityCollection(ResultSet table) {
@@ -92,8 +89,8 @@ public class EntityReader {
     }
 
     protected Query toQuery(EdmEntitySet edmEntitySet, UriInfo uriInfo) throws ODataApplicationException {
-        Query result = new Query().from(edmEntitySet.getName());
-
+        Query result = getQueryByName(edmEntitySet.getName());
+ 
         // $count=true
         processCount(uriInfo, result);
 
@@ -256,13 +253,13 @@ public class EntityReader {
         from the network.
          */
         Entity result = new Entity();
-        for (TableColumn eachColumn : table.getColumns()) {
-            Value v = row.get(eachColumn.getPosition());
+        for (QueryColumn eachColumn : table.getColumns()) {
+            Value v = row.get(eachColumn.getColumnIndex());
             Property p = new Property(null, eachColumn.getName(), ValueType.PRIMITIVE, v.value());
             result.addProperty(p);
         }
         // TODO: we assume there is only one primary key.
-        Object primaryKey = row.get(table.getPrimaryKey().get(0).getPosition());
+        Object primaryKey = row.get(table.getPrimaryKey().get(0).getColumnIndex());
         result.setId(createId(table.getName(), primaryKey));
         return result;
     }

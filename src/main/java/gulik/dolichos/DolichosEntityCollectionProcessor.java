@@ -52,7 +52,7 @@ public class DolichosEntityCollectionProcessor extends EntityReader  implements 
 
         // 2nd: fetch the data from backend for this requested EntitySetName
         // it has to be delivered as EntitySet object
-        EntityCollection entitySet = toEntityCollection(doQuery(toQuery(edmEntitySet, uriInfo)));
+        EntityCollection entitySet = toEntityCollection(toQuery(edmEntitySet, uriInfo).execute());
 
         // 3rd: create a serializer based on the requested format (json)
         ODataSerializer serializer = odata.createSerializer(responseFormat);

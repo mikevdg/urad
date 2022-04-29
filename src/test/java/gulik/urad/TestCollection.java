@@ -65,7 +65,7 @@ public class TestCollection {
         q.orderBy("Name");
 
         ResultSet result = new VegetableTable().query(q);
-        int columnNum = result.getColumnNumber("Name");
+        QueryColumn columnNum = result.getColumnByName("Name");
 
         List<Row> v = result.stream().collect(Collectors.toList());
         assertTrue(v.get(0).get(columnNum).toString().equals("'alfalfa'"));

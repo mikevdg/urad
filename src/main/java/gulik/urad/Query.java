@@ -1,6 +1,8 @@
 package gulik.urad;
 
 import gulik.urad.exceptions.NotImplemented;
+import gulik.urad.queryColumn.QueryColumn;
+import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 import gulik.urad.where.Clause;
 
@@ -14,10 +16,10 @@ import java.util.List;
  *
  */
 public class Query {
-    private String from;
-    private List<String> selects = new ArrayList<>();
+    private Table from;
+    private List<QueryColumn> selects = new ArrayList<>();
     private List<Clause> whereClauses = new ArrayList<>();
-    private List<String> orderBy = new ArrayList<>();
+    private List<QueryColumn> orderBy = new ArrayList<>();
     private Integer top;
     private Integer skip;
     private boolean isCount=false;
@@ -30,13 +32,40 @@ public class Query {
         return new Query(); // TODO
     }
 
+    public ResultSet execute() {
+        return from.query(this);
+    }
     /* Methods for building a query: */
 
     /** Add the given column to my result. You can call me multiple times to add more columns.
      * Calling me multiple time with the same column path is benign. */
     public Query select(String columnPath){
-        selects.add(columnPath);
+        // TODO: parse the columnPath.
+        for (TableColumn each : from.getColumns()) {
+            if (each.getName().equals(columnPath)) {
+                selects.add(QueryColumn.from(each));
+                break;
+            }
+        }
+        renumberColumns();
         return this;
+    }
+
+    /** Do a "SELECT * FROM ..." */
+    public Query selectAll() {
+        for (TableColumn each : from.getColumns()) {
+            selects.add(QueryColumn.from(each));
+        }
+        renumberColumns();
+        return this;
+    }
+
+    private void renumberColumns() {
+        int i = 0;
+        for (QueryColumn each : selects) {
+            each.setColumnIndex(i);
+            i++;
+        }
     }
 
     /** OData has this concept of "select by the ID" where we are expected to know what
@@ -50,8 +79,8 @@ public class Query {
     /** Set my target. I can only be called once or I throw an IllegalArgumentException.
        Sometimes this is redundant; it depends on the implementation of the Queryable.
      */
-    public Query from(String entityName) {
-        this.from = entityName;
+    public Query from(Table entity) {
+        this.from = entity;
         return this;
     }
 
@@ -66,8 +95,14 @@ public class Query {
     /** Sort the results. Calling me multiple times adds more columns to sort by.
      */
     public Query orderBy(String columnPath){
-        orderBy.add(columnPath);
-        return this;
+        // TODO: parse the columnPath.
+        for (TableColumn each : this.from.getColumns()) {
+            if (each.getName().equals(columnPath)) {
+                orderBy.add(QueryColumn.from(each));
+                return this;
+            }
+        }
+        throw new IndexOutOfBoundsException("Could not find column "+columnPath+" in "+from.getName());
     }
 
     /** Only show this many results: */
@@ -109,15 +144,25 @@ public class Query {
 
     /* Methods used by the Queryable. */
 
-    public List<String> getSelects(){
+    public List<QueryColumn> getSelects(){
         return selects;
+    }
+
+    public List<QueryColumn> getPrimaryKey() {
+        List<QueryColumn> result = new ArrayList<>();
+        for (TableColumn each : from.getColumns()) {
+            if (each.isPrimaryKey()) {
+                result.add(QueryColumn.from(each));
+            }
+        }
+        return result;
     }
 
     public boolean isSelectAll() {
         return selects.isEmpty();
     }
 
-    public String getFrom(){
+    public Table getFrom(){
         return from;
     }
 
@@ -131,7 +176,7 @@ public class Query {
         return whereClauses;
     }
 
-    public List<String> getOrderBys(){
+    public List<QueryColumn> getOrderBys(){
         return orderBy;
     }
 

@@ -69,7 +69,7 @@ public class DolichosEntityProcessor extends EntityReader implements EntityProce
     private Entity readEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyPredicates) throws ODataApplicationException {
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
-        Query query = new Query().from(edmEntitySet.getName());
+        Query query = getQueryByName(edmEntitySet.getName());
 
         for (final UriParameter key : keyPredicates) {
             String keyName = key.getName();
@@ -77,7 +77,7 @@ public class DolichosEntityProcessor extends EntityReader implements EntityProce
             query.where(Clause.equal(keyName, keyValue));
         }
 
-        ResultSet table = doQuery(query);
+        ResultSet table = query.execute();
         return toEntity(table.stream().findFirst().get(), table);
     }
 

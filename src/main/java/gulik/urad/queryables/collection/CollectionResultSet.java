@@ -21,14 +21,16 @@ import gulik.urad.ResultSet;
 import gulik.urad.Type;
 import gulik.urad.exceptions.ColumnDoesNotExist;
 import gulik.urad.exceptions.NotImplemented;
+import gulik.urad.queryColumn.QueryColumn;
 import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
-/** I'm a wrapper around a collection.
+/**
+ * I'm a wrapper around a collection.
  * TODO: dictionaries can be list elements and have natural column names.
  * TODO: Can a Map be a source?
  * TODO: The JPAQueryable will be similar to this - reuse code?
- * */
+ */
 public class CollectionResultSet implements ResultSet, RowGenerator {
     private final Object[] source;
     protected final Table definition;
@@ -55,8 +57,8 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
             return Type.Date;
         }
         throw new IndexOutOfBoundsException(
-            "Method getter get"+columnName+"() returns unmappable type: "
-            +t.getName()+". Remember to use classes rather than boxed typed.");
+                "Method getter get" + columnName + "() returns unmappable type: "
+                        + t.getName() + ". Remember to use classes rather than boxed typed.");
     }
 
     @Override
@@ -77,27 +79,23 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
     }
 
     @Override
-    public List<TableColumn> getColumns() {
-        return definition.getColumns();
+    public List<QueryColumn> getColumns() {
+        return query.getSelects();
     }
 
     @Override
     public QueryColumn getColumnByName(String name) {
         for (QueryColumn each : query.getSelects()) {
-
+            if (each.getName().equals(name)) {
+                return each;
+            }
         }
+        throw new IndexOutOfBoundsException("Could not find column " + name + " in query " + query.toString());
     }
 
     @Override
-    public List<TableColumn> getPrimaryKey() {
-        List<TableColumn> result = new ArrayList<>();
-        for (TableColumn each : getColumns()) {
-            if (each.isPrimaryKey()) {
-                result.add(each);
-            }
-        }
-
-        return result;
+    public List<QueryColumn> getPrimaryKey() {
+        return query.getPrimaryKey();
     }
 
     @Override
@@ -126,7 +124,7 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
     }
 
     @Override
-    public Iterator sourceIterator() {
+    public Iterator<Object> sourceIterator() {
         return Arrays.stream(source).iterator();
     }
 
@@ -134,36 +132,33 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
     public Row toRow(Object something) {
         int numColumns;
         if (this.query.getSelects().isEmpty()) {
-            // SELECT * 
-            numColumns = this.definition.getColumns().size();
-            Row result = new gulik.urad.impl.Row(numColumns);
-            int i=0;
-            for (TableColumn each : this.definition.getColumns()) {
-                result.set(i, getValue(something, each.getName()));
-            }
-            return result;
-        } else {
-            // SELECT A, B, C...
-            numColumns = this.query.getSelects().size();
-            Row result = new gulik.urad.impl.Row(numColumns);
-            int i=0;
-            for (String each : this.query.getSelects()) {
-                result.set(i, getValue(something, each));
-            }
-            return result;
+            query.selectAll();
         }
+        numColumns = this.query.getSelects().size();
+        Row result = new Row(this, numColumns);
+        for (QueryColumn each : this.query.getSelects()) {
+            result.set(each.getColumnIndex(), getValue(something, each));
+        }
+
+        int i=0;
+        for (QueryColumn each : this.query.getPrimaryKey()) {
+            result.setPrimaryKey(i, getValue(something, each));
+        }
+        return result;
+
     }
 
-    public Value getValue(Object something, String columnName) {
+    public Value getValue(Object something, QueryColumn column) {
         boolean found = false;
 
         // Is it a getter method?
         for (Method eachMethod : something.getClass().getDeclaredMethods()) {
-            if(Modifier.isPublic(eachMethod.getModifiers())
+            if (Modifier.isPublic(eachMethod.getModifiers())
                     && eachMethod.getName().startsWith("get")
-                    && eachMethod.getParameterCount()==0) {
-                if (("get" + columnName).toLowerCase().equals(eachMethod.getName().toLowerCase())) {
-                    // We do toLowerCase() because the column might be named "foo" and the getter is "getFoo()"
+                    && eachMethod.getParameterCount() == 0) {
+                if (("get" + column.getName()).toLowerCase().equals(eachMethod.getName().toLowerCase())) {
+                    // We do toLowerCase() because the column might be named "foo" and the getter is
+                    // "getFoo()"
                     try {
                         Value v = Value.of(eachMethod.invoke(something));
                         return v;
@@ -188,51 +183,61 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
             }
         }
 
-        throw new IndexOutOfBoundsException("Could not find field " + columnName + " in " + Objects.toString(something));
+        throw new IndexOutOfBoundsException(
+                "Could not find field " + column + " in " + Objects.toString(something));
     }
 
-    /** Return a sorted version of c, sorted by the orderBys in the Query q.*/
+    /** Return a sorted version of c, sorted by the orderBys in the Query q. */
     private void sort() {
-        /** Difficulty: we must sort by:
-         * 1. A property which could be a direct member of c, or could be down a path in c.
+        /**
+         * Difficulty: we must sort by:
+         * 1. A property which could be a direct member of c, or could be down a path in
+         * c.
          * 2. More properties of c after that.
          */
-        List<java.util.Comparator> comparators = query.getOrderBys().stream().map(each ->
-                asComparator(each))
+        List<java.util.Comparator> comparators = query.getOrderBys().stream().map(each -> asComparator(each))
                 .collect(Collectors.toList());
         // for each of the orderBys,
-        for (int orderByIndex = 0; orderByIndex<query.getOrderBys().size(); orderByIndex++) {
-            // Sort the whole list in fragments, where each fragment is where elements in the previous sort were equal.
-            int from=0; // Start of each fragment.
+        for (int orderByIndex = 0; orderByIndex < query.getOrderBys().size(); orderByIndex++) {
+            // Sort the whole list in fragments, where each fragment is where elements in
+            // the previous sort were equal.
+            int from = 0; // Start of each fragment.
             while (from < source.length) {
                 int to; // End of each fragment.
                 to = findEndOfFragment(source, from, comparators, orderByIndex);
-                // Arrays.sort() sorts from 'from' inclusive, to 'to' exclusive. to must be one more than the end.
-                Arrays.sort(source, from, to+1, comparators.get(orderByIndex));
-                from = to+1;
+                // Arrays.sort() sorts from 'from' inclusive, to 'to' exclusive. to must be one
+                // more than the end.
+                Arrays.sort(source, from, to + 1, comparators.get(orderByIndex));
+                from = to + 1;
             }
         }
     }
 
     /** Create a comparator for sorting the named "column" in any given object. */
-    private java.util.Comparator asComparator(String orderBy) {
+    private java.util.Comparator<Object> asComparator(QueryColumn orderBy) {
         return Comparator.comparing(something -> getValue(something, orderBy));
     }
 
-    /** When sorting a collection, we have several orderBy clauses. The collection is first sorted by the
-     * first orderBy, then the second, then the third, etc, except that after the first orderBy, we only
-     * sort the elements that were equal to each other in previous sorting iterations.
+    /**
+     * When sorting a collection, we have several orderBy clauses. The collection is
+     * first sorted by the
+     * first orderBy, then the second, then the third, etc, except that after the
+     * first orderBy, we only
+     * sort the elements that were equal to each other in previous sorting
+     * iterations.
      *
-     * Here we try to find the end of a fragment of elements that are equal for all comparators up to the
+     * Here we try to find the end of a fragment of elements that are equal for all
+     * comparators up to the
      * current one (comparators.get(orderByIndex)).
      */
     private int findEndOfFragment(Object[] c, int from, List<java.util.Comparator> comparators, int orderByIndex) {
         int to = from;
         Object currentElement = c[from];
-        while (to<c.length-1) {
+        while (to < c.length - 1) {
             to++;
             Object nextElement = c[to];
-            for (int i=0; i<orderByIndex-1; i++) { // For each relevant comparator (we don't care about >orderByIndex yet)
+            for (int i = 0; i < orderByIndex - 1; i++) { // For each relevant comparator (we don't care about
+                                                         // >orderByIndex yet)
                 java.util.Comparator currentComparator = comparators.get(i);
                 if (currentComparator.compare(currentElement, nextElement) != 0) {
                     return to - 1;
@@ -244,7 +249,7 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
 
     @Override
     public boolean hasCount() {
-        return null!=count;
+        return null != count;
     }
 
     @Override
