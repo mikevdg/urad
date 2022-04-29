@@ -39,10 +39,10 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 
-import gulik.urad.Column;
 import gulik.urad.Query;
 import gulik.urad.Row;
 import gulik.urad.Table;
+import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
 public class EntityReader {
@@ -255,7 +255,7 @@ public class EntityReader {
         from the network.
          */
         Entity result = new Entity();
-        for (Column eachColumn : table.getColumns()) {
+        for (TableColumn eachColumn : table.getColumns()) {
             Value v = row.get(eachColumn.getPosition());
             Property p = new Property(null, eachColumn.getName(), ValueType.PRIMITIVE, v.value());
             result.addProperty(p);

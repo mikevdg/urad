@@ -1,13 +1,14 @@
 package gulik.demo;
 
+import gulik.dolichos.ColumnListBuilder;
 import gulik.dolichos.ODataEntitySet;
-import gulik.urad.Column;
 import gulik.urad.Query;
 import gulik.urad.Table;
 import gulik.urad.Type;
 import gulik.urad.annotations.GetEntities;
 import gulik.urad.annotations.ODataEndpoint;
 import gulik.urad.queryables.collection.CollectionQueryable;
+import gulik.urad.tableColumn.TableColumn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +38,12 @@ public class FruitEntitySet implements ODataEntitySet {
     }
 
     @Override
-    public Column[] getColumns() {
-        return new gulik.urad.impl.Column[] {
-            new gulik.urad.impl.Column().setName("name").setType(Type.String),
-            new gulik.urad.impl.Column().setName("numberOfSeeds").setType(Type.Integer)
-        };
+    public List<TableColumn> getColumns() {
+        return new ColumnListBuilder()
+            .add("name", Type.String)
+            .add("numberOfSeeds", Type.Integer)
+            .pk("name")
+            .build();
     }
 
     @Override

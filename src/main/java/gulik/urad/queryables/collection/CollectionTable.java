@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import gulik.dolichos.ODataEntitySet;
-import gulik.urad.Column;
 import gulik.urad.Query;
 import gulik.urad.Row;
 import gulik.urad.Table;
 import gulik.urad.Type;
 import gulik.urad.exceptions.ColumnDoesNotExist;
 import gulik.urad.exceptions.NotImplemented;
+import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
 /** I'm a wrapper around a collection.
@@ -77,14 +77,14 @@ public class CollectionTable implements Table, RowGenerator {
     }
 
     @Override
-    public List<Column> getColumns() {
+    public List<TableColumn> getColumns() {
         return definition.getColumns();
     }
 
     @Override
-    public List<Column> getPrimaryKey() {
-        List<Column> result = new ArrayList<>();
-        for (Column each : getColumns()) {
+    public List<TableColumn> getPrimaryKey() {
+        List<TableColumn> result = new ArrayList<>();
+        for (TableColumn each : getColumns()) {
             if (each.isPrimaryKey()) {
                 result.add(each);
             }
@@ -128,10 +128,10 @@ public class CollectionTable implements Table, RowGenerator {
         int numColumns;
         if (this.query.getSelects().isEmpty()) {
             // SELECT * 
-            numColumns = this.definition.getColumns().length;
+            numColumns = this.definition.getColumns().size();
             Row result = new gulik.urad.impl.Row(numColumns);
             int i=0;
-            for (ColumnDefinition each : this.definition.getColumns()) {
+            for (TableColumn each : this.definition.getColumns()) {
                 result.set(i, getValue(something, each.getName()));
             }
             return result;
@@ -243,14 +243,5 @@ public class CollectionTable implements Table, RowGenerator {
     @Override
     public Integer getCount() {
         return count;
-    }
-
-    @Override
-    public int getColumnNumber(String columnName) throws ColumnDoesNotExist {
-        return columns.stream()
-                .filter(any -> columnName.equals(any.getName()))
-                .map(each -> each.getPosition())
-                .findFirst()
-                .orElseThrow(() -> new ColumnDoesNotExist(columnName));
     }
 }

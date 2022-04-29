@@ -5,6 +5,8 @@ public enum Type {
     String,
     Float,
     Date,
+    Time,
+    Timestamp,
     Boolean,
     NavigableProperty
 }

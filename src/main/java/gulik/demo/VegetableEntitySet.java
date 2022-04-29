@@ -3,12 +3,13 @@ package gulik.demo;
 import java.util.ArrayList;
 import java.util.List;
 
-import gulik.dolichos.ColumnDefinition;
+import gulik.dolichos.ColumnListBuilder;
 import gulik.dolichos.ODataEntitySet;
 import gulik.urad.Query;
 import gulik.urad.Table;
 import gulik.urad.Type;
 import gulik.urad.queryables.collection.CollectionQueryable;
+import gulik.urad.tableColumn.TableColumn;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
 // TODO: implements Table??? extends Table? Isn't ODataEntitySet just a table?
@@ -48,25 +49,14 @@ public class VegetableEntitySet implements ODataEntitySet {
     }
 
     @Override
-    public ColumnDefinition[] getColumns() {
-        /*
-            Ideal code: 
-            import static Factory.*;
-            return columns()
-                .add("name", Text)
-                .add("colour", fk("Colour", "id"))
-                .add("childrenLikeIt", Bool)
-                .add("weight", Float)
-                .primaryKey("name")
+    public List<TableColumn> getColumns() {
+        return new ColumnListBuilder()
+                .add("name", Type.String)
+                .add("colour", Type.String) // fk("Colour", "id"))
+                .add("childrenLikeIt", Type.Boolean)
+                .add("weight", Type.Float)
+                .pk("name")
                 .build();
-        */
-
-        return new ColumnDefinition[] {
-            new ColumnDefinition("name", Type.String),
-            new ColumnDefinition("colour", Type.String),
-            new ColumnDefinition("childrenLikeIt", Type.Boolean),
-            new ColumnDefinition("weight", Type.Float)
-        };
     }
 
     @Override

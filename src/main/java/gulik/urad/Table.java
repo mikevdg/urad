@@ -1,6 +1,7 @@
 package gulik.urad;
 
 import gulik.urad.exceptions.ColumnDoesNotExist;
+import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
 import java.util.List;
@@ -19,9 +20,8 @@ public interface Table extends Iterable<gulik.urad.Row> {
     /** Return a lengthy diatribe of what I am. */
     String getDescription();
 
-    List<Column> getColumns();
-    List<Column> getPrimaryKey();
-    int getColumnNumber(String columnName) throws ColumnDoesNotExist;
+    List<TableColumn> getColumns();
+    List<TableColumn> getPrimaryKey();
     Stream<Row> stream();
 
     /** The "count" concept in OData differs from SQL. In an OData response, the count of the entire query

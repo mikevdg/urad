@@ -2,9 +2,9 @@ package gulik.dolichos;
 
 import java.util.List;
 
-import gulik.urad.Column;
 import gulik.urad.Query;
 import gulik.urad.Table;
+import gulik.urad.tableColumn.TableColumn;
 
 /* TODO: Is this just a "Table"?
 
@@ -18,7 +18,7 @@ Tables have concrete implementations. Query results are generated. I guess they 
 
 public interface ODataEntitySet {
     public String getName();
-    public List<Column> getColumns();
+    public List<TableColumn> getColumns();
     public Table query(Query q);
     public Table create(Table t);
     public Table update(Table t);

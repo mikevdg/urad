@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class EmptyTable extends CollectionTable {
 
     public EmptyTable(ODataEntitySet definition, Object[] source, Query query) {
-        super(definition.getName(), source, query);
+        super(definition, source, query);
     }
 
     @Override

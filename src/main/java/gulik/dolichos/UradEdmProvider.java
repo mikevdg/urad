@@ -72,13 +72,13 @@ public class UradEdmProvider extends CsdlAbstractEdmProvider {
     private CsdlEntityType createEntityTypeFrom(ODataEntitySet es) {
         // TODO: check for nulls on everything the user might provide.
 
-        List<CsdlProperty> columns = Arrays.stream(es.getColumns())
+        List<CsdlProperty> columns = es.getColumns().stream()
                 .map(c -> new CsdlProperty()
                         .setName(c.getName())
                         .setType(edmTypeOf(c.getType())))
                 .collect(Collectors.toList());
 
-        List<CsdlPropertyRef> primaryKey = Arrays.stream(es.getColumns())
+        List<CsdlPropertyRef> primaryKey = es.getColumns().stream()
                 .filter(each -> each.isPrimaryKey())
                 .map(each -> new CsdlPropertyRef()
                         .setName(each.getName()))
