@@ -2,17 +2,16 @@ package gulik.urad.queryables.collection;
 
 import gulik.urad.Query;
 import gulik.urad.Row;
-import gulik.urad.Table;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-/** I'm returned if a query is performed with no data present - meaning that we can't derive columns. */
+/** I'm returned if a query is performed with no data present. */
 public class EmptyResultSet extends CollectionResultSet {
 
-    public EmptyResultSet(Table definition, Object[] source, Query query) {
-        super(definition, source, query);
+    public EmptyResultSet(Query query, Object[] source) {
+        super(query, source);
     }
 
     @Override

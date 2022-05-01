@@ -16,7 +16,7 @@ import java.util.List;
  *
  */
 public class Query {
-    private Table from;
+    private final Table from;
     private List<QueryColumn> selects = new ArrayList<>();
     private List<Clause> whereClauses = new ArrayList<>();
     private List<QueryColumn> orderBy = new ArrayList<>();
@@ -24,16 +24,12 @@ public class Query {
     private Integer skip;
     private boolean isCount=false;
 
-    /** A special type of query - don't retrieve rows, but return a Table object
-     * so that the caller can inspect the column definitions.
-     * @return
-     */
-    public static Query queryDefinition() {
-        return new Query(); // TODO
+    public Query(Table from) {
+        this.from = from;
     }
 
-    public ResultSet execute() {
-        return from.query(this);
+    public ResultSet fetch() {
+        return from.fetch(this);
     }
     /* Methods for building a query: */
 
@@ -75,14 +71,6 @@ public class Query {
     public Query selectById(Value[] values){/* TODO */ throw new NotImplemented();}
 
     // TODO public Query distinct() ???
-
-    /** Set my target. I can only be called once or I throw an IllegalArgumentException.
-       Sometimes this is redundant; it depends on the implementation of the Queryable.
-     */
-    public Query from(Table entity) {
-        this.from = entity;
-        return this;
-    }
 
     /** Add a condition to the query. See the WhereClause class for a bunch of useful
     factory methods. Calling me multiple times just adds more conditions.
@@ -194,5 +182,9 @@ public class Query {
 
     public void selectCount() {
         isCount = true;
+    }
+
+    public Table getTable() {
+        return this.from;
     }
 }

@@ -1,55 +1,23 @@
 package gulik.urad;
 
-import gulik.demo.Vegetable;
-import gulik.demo.VegetableTable;
-import gulik.urad.exceptions.ColumnDoesNotExist;
-import gulik.urad.queryables.collection.CollectionQueryable;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import gulik.demo.VegetableTable;
+import gulik.urad.exceptions.ColumnDoesNotExist;
 
 public class TestCollection {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    private List<Vegetable> veges() {
-        List<Vegetable> veges = new ArrayList<>();
-        Vegetable v;
-
-        // Put them out of order so we can try sorting them.
-        v = new Vegetable();
-        v.setName("cabbage");
-        v.setChildrenLikeIt(false);
-        v.setColour("blue");
-        v.setWeight(10);
-            v.setPlanted(date("2000-01-04"));
-        veges.add(v);
-
-        v = new Vegetable();
-        v.setName("alfalfa");
-        v.setChildrenLikeIt(true);
-        v.setColour("yellow");
-        v.setWeight(2);
-            v.setPlanted(date("2000-01-03"));
-        veges.add(v);
-
-        v = new Vegetable();
-        v.setName("brusselsprout");
-        v.setChildrenLikeIt(true);
-        v.setColour("grey");
-        v.setWeight(5);
-            v.setPlanted(date("2000-01-02"));
-
-        veges.add(v);
-        return veges;
-    }
 
     private Date date(String d) {
         try {
@@ -61,64 +29,57 @@ public class TestCollection {
 
     @Test
     public void testOrderByName() {
-        Query q = new Query();
-        q.orderBy("Name");
+        Table t = new VegetableTable();
 
-        ResultSet result = new VegetableTable().query(q);
-        QueryColumn columnNum = result.getColumnByName("Name");
+        ResultSet result = new VegetableTable().select().orderBy("Name").fetch();
 
         List<Row> v = result.stream().collect(Collectors.toList());
-        assertTrue(v.get(0).get(columnNum).toString().equals("'alfalfa'"));
-        assertTrue(v.get(1).get(columnNum).toString().equals("'brusselsprout'"));
-        assertTrue(v.get(2).get(columnNum).toString().equals("'cabbage'"));
+        assertTrue(v.get(0).getByName("Name").equals("'alfalfa'"));
+        assertTrue(v.get(1).getByName("Name").equals("'brusselsprout'"));
+        assertTrue(v.get(2).getByName("Name").equals("'cabbage'"));
     }
 
     @Test
     public void testOrderByDate() {
-        Query q = new Query();
-        q.orderBy("Planted");
-
-        ResultSet result = new CollectionQueryable(veges()).query(q);
+        ResultSet result = new VegetableTable().select().orderBy("Planted").fetch();
 
         List<Row> v = result.stream().collect(Collectors.toList());
-        int columnNum = result.getColumnNumber("Planted");
-        assertTrue(v.get(0).get(columnNum).toString().equals("2000-01-02"));
-        assertTrue(v.get(1).get(columnNum).toString().equals("2000-01-03"));
-        assertTrue(v.get(2).get(columnNum).toString().equals("2000-01-04"));
+        assertTrue(v.get(0).getByName("Date").equals("2000-01-02"));
+        assertTrue(v.get(1).getByName("Date").equals("2000-01-03"));
+        assertTrue(v.get(2).getByName("Date").equals("2000-01-04"));
     }
-
 
     @Test
     public void testOrderByWeight() {
-        Query q = new Query();
-        q.orderBy("Weight");
-
-        ResultSet result = new CollectionQueryable(veges()).query(q);
-        int columnNum = result.getColumnNumber("Weight");
+        Table t = new VegetableTable();
+        ResultSet result = t.select().orderBy("Weight").fetch();
 
         List<Row> v = result.stream().collect(Collectors.toList());
-        assertTrue(v.get(0).get(columnNum).toString().equals("2"));
-        assertTrue(v.get(1).get(columnNum).toString().equals("5"));
-        assertTrue(v.get(2).get(columnNum).toString().equals("10"));
+        assertTrue(v.get(0).getByName("Weight").equals("2"));
+        assertTrue(v.get(1).getByName("Weight").equals("5"));
+        assertTrue(v.get(2).getByName("Weight").equals("10"));
     }
 
     @Test
     public void testSelect() {
-        Query q = new Query().select("Planted").select("Weight");
-        ResultSet result = new CollectionQueryable(veges()).query(q);
+        Table t = new VegetableTable();
+        ResultSet result = t.select("Planted", "Weight").fetch();
         assertEquals(result.getColumnNumber("Planted"), 0);
         assertEquals(result.getColumnNumber("Weight"), 1);
 
         try {
             result.getColumnNumber("Name");
             fail();
-        } catch (ColumnDoesNotExist e) {}
+        } catch (ColumnDoesNotExist e) {
+        }
     }
 
     @Test
     public void testSelectAll() {
-        Query q = new Query();
-        ResultSet result = new CollectionQueryable(veges()).query(q);
+        Table t = new VegetableTable();
+
+        ResultSet result = t.select().fetch();
+
         // We have no guarantees about the ordering of the columns.
         // Reflection on classes cannot tell us this.
         HashSet<Integer> h = new HashSet<Integer>();

@@ -4,10 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -15,14 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import gulik.urad.Query;
-import gulik.urad.Row;
-import gulik.urad.Table;
 import gulik.urad.ResultSet;
-import gulik.urad.Type;
-import gulik.urad.exceptions.ColumnDoesNotExist;
+import gulik.urad.Row;
 import gulik.urad.exceptions.NotImplemented;
 import gulik.urad.queryColumn.QueryColumn;
-import gulik.urad.tableColumn.TableColumn;
 import gulik.urad.value.Value;
 
 /**
@@ -31,71 +25,15 @@ import gulik.urad.value.Value;
  * TODO: Can a Map be a source?
  * TODO: The JPAQueryable will be similar to this - reuse code?
  */
-public class CollectionResultSet implements ResultSet, RowGenerator {
+public class CollectionResultSet extends ResultSet implements RowGenerator {
     private final Object[] source;
-    protected final Table definition;
-    private final Query query;
-    private Integer count;
 
-    public CollectionResultSet(Table definition, Object[] source, Query query) {
-        this.definition = definition;
+    public CollectionResultSet(Query query, Object[] source) {
+        super(query);
         this.source = source;
-        this.query = query;
         if (query.hasOrderBys()) {
             sort();
         }
-    }
-
-    private Type toType(String columnName, Class<?> t) {
-        if (String.class.equals(t)) {
-            return Type.String;
-        } else if (Integer.class.equals(t)) {
-            return Type.Integer;
-        } else if (Float.class.equals(t)) {
-            return Type.Float;
-        } else if (Date.class.equals(t)) {
-            return Type.Date;
-        }
-        throw new IndexOutOfBoundsException(
-                "Method getter get" + columnName + "() returns unmappable type: "
-                        + t.getName() + ". Remember to use classes rather than boxed typed.");
-    }
-
-    @Override
-    public String getCode() {
-        return definition.getName();
-    }
-
-    @Override
-    public String getName() {
-        // TODO: There is a "title" used in OData.
-        return definition.getName();
-    }
-
-    @Override
-    public String getDescription() {
-        // TODO
-        return definition.getName();
-    }
-
-    @Override
-    public List<QueryColumn> getColumns() {
-        return query.getSelects();
-    }
-
-    @Override
-    public QueryColumn getColumnByName(String name) {
-        for (QueryColumn each : query.getSelects()) {
-            if (each.getName().equals(name)) {
-                return each;
-            }
-        }
-        throw new IndexOutOfBoundsException("Could not find column " + name + " in query " + query.toString());
-    }
-
-    @Override
-    public List<QueryColumn> getPrimaryKey() {
-        return query.getPrimaryKey();
     }
 
     @Override
@@ -245,15 +183,5 @@ public class CollectionResultSet implements ResultSet, RowGenerator {
             }
         }
         return to;
-    }
-
-    @Override
-    public boolean hasCount() {
-        return null != count;
-    }
-
-    @Override
-    public Integer getCount() {
-        return count;
     }
 }

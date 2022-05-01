@@ -1,20 +1,18 @@
 package gulik.demo;
 
-import gulik.dolichos.ColumnListBuilder;
-import gulik.urad.Query;
-import gulik.urad.ResultSet;
-import gulik.urad.Table;
-import gulik.urad.Type;
-import gulik.urad.annotations.GetEntities;
-import gulik.urad.annotations.ODataEndpoint;
-import gulik.urad.queryables.collection.CollectionQueryable;
-import gulik.urad.tableColumn.TableColumn;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import gulik.dolichos.ColumnListBuilder;
+import gulik.urad.Query;
+import gulik.urad.ResultSet;
+import gulik.urad.Type;
+import gulik.urad.impl.AbstractTable;
+import gulik.urad.queryables.collection.CollectionQueryable;
+import gulik.urad.tableColumn.TableColumn;
+
 // @ODataEndpoint(namespace = "salad", container = "bowl")
-public class FruitTable implements Table {
+public class FruitTable extends AbstractTable {
     private List<Fruit> fruit;
 
     public FruitTable() {
@@ -33,7 +31,7 @@ public class FruitTable implements Table {
     }
 
     // @GetEntities("Vegetable")
-    public ResultSet query(Query q) {
+    public ResultSet fetch(Query q) {
         return new CollectionQueryable(this, fruit).query(q);
     }
 

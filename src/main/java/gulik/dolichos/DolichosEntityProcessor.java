@@ -77,7 +77,7 @@ public class DolichosEntityProcessor extends EntityReader implements EntityProce
             query.where(Clause.equal(keyName, keyValue));
         }
 
-        ResultSet table = query.execute();
+        ResultSet table = query.fetch();
         return toEntity(table.stream().findFirst().get(), table);
     }
 

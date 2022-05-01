@@ -8,12 +8,13 @@ import gulik.urad.Query;
 import gulik.urad.ResultSet;
 import gulik.urad.Table;
 import gulik.urad.Type;
+import gulik.urad.impl.AbstractTable;
 import gulik.urad.queryables.collection.CollectionQueryable;
 import gulik.urad.tableColumn.TableColumn;
 
 // @ODataEndpoint(namespace = "salad", container = "bowl")
 // TODO: implements Table??? extends Table? Isn't ODataEntitySet just a table?
-public class VegetableTable implements Table {
+public class VegetableTable extends AbstractTable {
     private List<Vegetable> veges;
 
     public VegetableTable() {
@@ -43,9 +44,9 @@ public class VegetableTable implements Table {
         veges.add(v);
     }
 
-    // @GetEntities("Vegetable")
-    public ResultSet query(Query q) {
-        return new CollectionQueryable(this, veges).query(q);
+    @Override
+    public String getName() {
+        return "Vegetables";
     }
 
     @Override
@@ -59,9 +60,9 @@ public class VegetableTable implements Table {
                 .build();
     }
 
-    @Override
-    public String getName() {
-        return "Vegetables";
+    // @GetEntities("Vegetable")
+    public ResultSet fetch(Query q) {
+        return new CollectionQueryable(this, veges).query(q);
     }
 
     @Override

@@ -17,20 +17,18 @@ public class CollectionQueryable implements Queryable {
     Ordering needs to be done here before we give a collection table a
     collection to iterate over.
      */
-    private final Table definition;
     private final Collection source;
 
     public CollectionQueryable(Table s, Collection c) {
         if (null==c) throw new NullPointerException();
-        this.definition = s;
         this.source = c;
     }
 
     @Override
     public ResultSet query(Query q) {
         if (source.isEmpty()) {
-            return new EmptyResultSet(this.definition, source.toArray(new Object[source.size()]), q);
+            return new EmptyResultSet(q, source.toArray(new Object[source.size()]));
         }
-        return new CollectionResultSet(this.definition, source.toArray(new Object[source.size()]), q);
+        return new CollectionResultSet(q, source.toArray(new Object[source.size()]));
     }
 }

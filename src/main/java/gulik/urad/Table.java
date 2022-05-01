@@ -17,7 +17,16 @@ Tables have concrete implementations. Query results are generated. I guess they 
 public interface Table {
     public String getName();
     public List<TableColumn> getColumns();
-    public ResultSet query(Query q);
+    
+    /* Create a new query. */
+    public Query select();
+    public Query select(String column1);
+    public Query select(String column1, String column2);
+    public Query select(String column1, String column2, String column3);
+
+    /* To get results from a query, call Query.fetch(). This method is used internally as the implementation of Query.fetch(). */
+    public ResultSet fetch(Query q); 
+
     public ResultSet create(ResultSet t);
     public ResultSet update(ResultSet t);
     public ResultSet delete(ResultSet t);

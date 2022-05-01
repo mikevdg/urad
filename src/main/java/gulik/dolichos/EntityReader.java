@@ -57,7 +57,7 @@ public class EntityReader {
     protected Query getQueryByName(String name) {
         for (Table each : entitySets) {
             if (each.getName().equals(name)) {
-                return new Query().from(each);
+                return new Query(each);
             }
         }
         throw new IndexOutOfBoundsException("Could not find entity set "+name);
