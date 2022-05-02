@@ -5,7 +5,7 @@ import java.util.Date;
 public class Vegetable {
     private String name;
     private String colour;  // TODO: an enum!
-    private boolean childrenLikeIt;
+    private Boolean childrenLikeIt;
     private Integer weight;
     private Date planted; // TODO: Joda time.
 
@@ -25,11 +25,11 @@ public class Vegetable {
         this.colour = colour;
     }
 
-    public boolean isChildrenLikeIt() {
+    public Boolean isChildrenLikeIt() {
         return childrenLikeIt;
     }
 
-    public void setChildrenLikeIt(boolean childrenLikeIt) {
+    public void setChildrenLikeIt(Boolean childrenLikeIt) {
         this.childrenLikeIt = childrenLikeIt;
     }
 

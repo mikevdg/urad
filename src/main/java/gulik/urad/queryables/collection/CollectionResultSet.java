@@ -78,7 +78,7 @@ public class CollectionResultSet extends ResultSet implements RowGenerator {
             result.set(each.getColumnIndex(), getValue(something, each));
         }
 
-        int i=0;
+        int i = 0;
         for (QueryColumn each : this.query.getPrimaryKey()) {
             result.setPrimaryKey(i, getValue(something, each));
         }
@@ -92,11 +92,11 @@ public class CollectionResultSet extends ResultSet implements RowGenerator {
         // Is it a getter method?
         for (Method eachMethod : something.getClass().getDeclaredMethods()) {
             if (Modifier.isPublic(eachMethod.getModifiers())
-                    && eachMethod.getName().startsWith("get")
+                    && (eachMethod.getName().startsWith("get") || eachMethod.getName().startsWith("is"))
                     && eachMethod.getParameterCount() == 0) {
-                if (("get" + column.getName()).toLowerCase().equals(eachMethod.getName().toLowerCase())) {
-                    // We do toLowerCase() because the column might be named "foo" and the getter is
-                    // "getFoo()"
+                String methodName = eachMethod.getName().toLowerCase();
+                String columnName = column.getName().toLowerCase();
+                if (methodName.equals("get" + columnName) || methodName.equals("is" + columnName)) {
                     try {
                         Value v = Value.of(eachMethod.invoke(something));
                         return v;
@@ -122,7 +122,7 @@ public class CollectionResultSet extends ResultSet implements RowGenerator {
         }
 
         throw new IndexOutOfBoundsException(
-                "Could not find field " + column + " in " + Objects.toString(something));
+                "Could not find getter or setter for \"" + column + "\" in the class " + Objects.toString(something));
     }
 
     /** Return a sorted version of c, sorted by the orderBys in the Query q. */

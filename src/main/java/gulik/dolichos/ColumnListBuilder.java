@@ -5,6 +5,8 @@ import java.util.List;
 
 import gulik.demo.NotImplementedException;
 import gulik.urad.Type;
+import gulik.urad.tableColumn.BooleanColumn;
+import gulik.urad.tableColumn.FloatColumn;
 import gulik.urad.tableColumn.IntegerColumn;
 import gulik.urad.tableColumn.StringColumn;
 import gulik.urad.tableColumn.TableColumn;
@@ -22,12 +24,21 @@ public class ColumnListBuilder {
             case Integer:
                 newColumn = new IntegerColumn();
                 break;
+            case Float:
+                newColumn = new FloatColumn();
+                break;
             case String:
                 newColumn = new StringColumn();
                 break;
             case Timestamp:
                 newColumn = new TimestampColumn();
+                break;
+            case Date:
+                newColumn = new TimestampColumn(); // TODO: DateColumn.
+                break;
             case Boolean:
+                newColumn = new BooleanColumn();
+                break;
             default:
                 throw new NotImplementedException();
         }

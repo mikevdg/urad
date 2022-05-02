@@ -29,6 +29,10 @@ public class Query {
     }
 
     public ResultSet fetch() {
+        if (this.getSelects().isEmpty()) {
+            selectAll();
+        }
+
         return from.fetch(this);
     }
     /* Methods for building a query: */
@@ -40,11 +44,11 @@ public class Query {
         for (TableColumn each : from.getColumns()) {
             if (each.getName().equals(columnPath)) {
                 selects.add(QueryColumn.from(each));
-                break;
+                renumberColumns();
+                return this;
             }
         }
-        renumberColumns();
-        return this;
+        throw new IndexOutOfBoundsException("Could not find column \""+columnPath+"\" in table "+this.getTable().getName());
     }
 
     /** Do a "SELECT * FROM ..." */

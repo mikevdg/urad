@@ -15,7 +15,11 @@ public abstract class Value implements Comparable {
             return new IntegerValue((Integer)something);
         }
         if (something instanceof Date) {
+            // TODO: ... timestamp?
             return new DateValue((Date)something);
+        }
+        if (something instanceof Boolean) {
+            return new BooleanValue((Boolean)something);
         }
         throw new RuntimeException("Can't make a Value out of "+ Objects.toString(something));
     }

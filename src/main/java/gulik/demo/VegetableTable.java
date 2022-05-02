@@ -1,6 +1,9 @@
 package gulik.demo;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import gulik.dolichos.ColumnListBuilder;
@@ -27,6 +30,7 @@ public class VegetableTable extends AbstractTable {
         v.setColour("red");
         v.setChildrenLikeIt(true);
         v.setWeight(10);
+        v.setPlanted(date("2000-01-02"));
         veges.add(v);
 
         v = new Vegetable();
@@ -34,6 +38,7 @@ public class VegetableTable extends AbstractTable {
         v.setColour("white");
         v.setChildrenLikeIt(true);
         v.setWeight(1);
+        v.setPlanted(date("2000-01-03"));
         veges.add(v);
 
         v = new Vegetable();
@@ -41,6 +46,7 @@ public class VegetableTable extends AbstractTable {
         v.setColour("green");
         v.setChildrenLikeIt(false);
         v.setWeight(5);
+        v.setPlanted(date("2000-01-04"));
         veges.add(v);
     }
 
@@ -56,6 +62,7 @@ public class VegetableTable extends AbstractTable {
                 .add("colour", Type.String) // fk("Colour", "id"))
                 .add("childrenLikeIt", Type.Boolean)
                 .add("weight", Type.Float)
+                .add("planted", Type.Date)
                 .pk("name")
                 .build();
     }
@@ -78,5 +85,15 @@ public class VegetableTable extends AbstractTable {
     @Override
     public ResultSet delete(ResultSet t) {
         throw new NotImplementedException();
+    }
+
+    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    private static Date date(String d) {
+        try {
+            return dateFormat.parse(d);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

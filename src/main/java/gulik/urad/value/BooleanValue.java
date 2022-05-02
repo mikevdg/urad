@@ -1,9 +1,9 @@
 package gulik.urad.value;
 
-public class StringValue extends Value {
-    String value;
-    
-    public StringValue(String value) {
+public class BooleanValue extends Value {
+    Boolean value;
+
+    public BooleanValue(Boolean value) {
         this.value = value;
     }
 
@@ -17,7 +17,7 @@ public class StringValue extends Value {
         if (null==value) {
             return "";
         } else {
-            return "'"+value+"'";
+            return value.toString();
         }
     }
 }
