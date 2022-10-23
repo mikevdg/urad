@@ -25,6 +25,15 @@ New features:
 
 * Maybe change the encoding to ASN.1 PER over HTTP?
   - Maybe drop OData altogether and autogenerate OpenAPI with all the query parameters.
+  - Tables and columns can be described by querying tables. Select * from tables;
+
+* Add Templates. Before an INSERT, give the client a template for the user to populate.
+
+* Server-side colunm verification. As the user types, ask the server whether the entered value is valid. Provide a descriptive reason to the user.
+
+* Formalize error messages and exceptions.
+  - "Query too difficult". 
+  - 
 
 * Does Odata already support $select=path1/path2/path3 and $filter=(path1/path2/path3 eq 'foo')???
 
@@ -59,3 +68,9 @@ New features:
   - Formula columns
   - Triggers
   - Maybe even batch updates?
+  - Or just ask the server to verify columns.
+
+* Describe server limits
+  - Max number of retrievable rows.
+  - Any rate limiting?
+  - Check the RESTier limits.
