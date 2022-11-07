@@ -21,6 +21,7 @@ Remove features:
 * Edm.Binary, Edm.Stream, Edm.SBytes. Replace them with a URL link instead so that we get MIME types, download sizes, etc.
 
 * Reduce all the numeric types to numbers with upper limit, lower limit, precision.
+* $count only returns the count; no data.
 
 In general, if something can already be done, don't add another way of doing it.
 
